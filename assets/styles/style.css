@@ -1,0 +1,99 @@
+body {
+    margin: 0;
+    background: #F5F7FA;
+}
+*, ::after, ::before {
+    box-sizing: border-box;
+}
+.table-wrapper {
+    width: 1000px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+}
+table.table, tbody {
+    display: block;
+}
+thead, tr {
+    display: block;
+}
+table.table thead th {
+    display: block;
+    float: left;
+    width: 20%;
+    text-align: left;
+    border: 1px solid #e4e4e4;
+    border-right: 0;
+    border-bottom: 0;
+    min-height: 40px;
+    line-height: 40px;
+    padding: 0 15px;
+}
+.table td:last-child, .table th:last-child {
+    border-right: 1px solid #e4e4e4;
+}
+.table tbody td {
+    width: 20%;
+    display: block;
+    float: left;
+}
+button.fEditRow, .cEditRow {
+    display: none;
+}
+.table td {
+    width: 20%;
+    display: block;
+    float: left;
+    border: 1px solid #e4e4e4;
+    border-right: 0;
+    border-bottom: 0;
+    min-height: 55px;
+    line-height: 55px;
+    padding: 0 15px;
+}
+.table tbody tr:last-child {
+    border-bottom: 1px solid #e4e4e4;
+}
+thead, tr {
+    display: block;
+    border-spacing: 0;
+}
+.table tbody td:last-child {
+    text-align: center;
+}
+.table td button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+tr:not(.addr) button {
+    margin: 5px;
+    font-size: 14px;
+}
+button.editRow {
+    color: #FFC107;
+}
+button.deleteRow, button.cEditRow {
+    color: #E34724;
+}
+button.fEditRow {
+    color: #27C46B;
+}
+.table button.add-new {
+    background: #117a8b;
+    color: #ffffffe6;
+    padding: 6px 20px;
+    border-radius: 16px;
+}
+button.add-new svg {
+    margin-right: 6px;
+    font-size: 12px;
+}
+td input {
+    border: 1px solid #d5d5d5;
+    width: 100%;
+    padding: 6px 14px;
+    background: #fff;
+}

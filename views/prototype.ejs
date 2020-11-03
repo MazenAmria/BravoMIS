@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/FontAwesome.min.css">
+    <link rel="stylesheet" href="styles/grid-system.min.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/FontAwesome.min.js"></script>
+    <script src="js/main.js"></script>
+</head>
+<body>
+    <% if(tableData.length >= 0){ %>
+        <div class="table-wrapper">
+            <div class='table-title'>
+                <h2>Items Table</h2>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr class="clearfix">
+                        <% for(let i = 0; i < tableColumns.length; i++){ %> 
+                            <th><%= tableColumns[i] %> </th>
+                        <% } %> 
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(let i = 0; i < tableData.length; i++){ %>
+                        <tr class="clearfix">
+                            <% for(const key in tableData[i]){ %>
+                                <td name="<%= key %>" ><%= tableData[i][key] %></td>
+                            <% } %> 
+                            <td><button class='editRow'><i class="fas fa-pencil-alt"></i></button><button class="fEditRow"><i class="fas fa-check"></i></button><button class="cEditRow"><i class="fas fa-times"></i></button><button class='deleteRow'><i class="fas fa-trash-alt"></i></button></td>
+                        </tr>
+                    <% } %>
+                    <tr class="clearfix addr">
+                        <% for(let i = 0; i < tableColumns.length; i++){ %> 
+                            <td name="<%= tableColumns[i] %>" ><input name="<%= tableColumns[i] %> "></td>
+                        <% } %> 
+                        <td><button class='add-new'><i class="fas fa-plus"></i>Add New</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    <% } %> 
+</body>
+</html>
