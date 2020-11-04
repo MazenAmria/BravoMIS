@@ -17,7 +17,7 @@ app.use(express.urlencoded({extended:true}));
 var con = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "2mgmbz7gj",
+    password: "1234",
     database: "test"
 });
 
