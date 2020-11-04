@@ -5,14 +5,14 @@ $(document).ready(function(){
             $row.find(".editRow, .deleteRow").css("display", "none");
             $row.find(".fEditRow, .cEditRow").css("display", "inline-block");
             $row.find("td").not(":last-child").each(function(){
-                $(this).html(`<input name='${$(this).attr('name')}' value='${$(this).text()}'><input class='original-data' value='${$(this).text()}' style='display: none;'>`);
+                $(this).html(`<input name='${$(this).attr('name')}' value='${$(this).text()}'>`);
             });
         });
         $row.find(".cEditRow").on('click', function(){
             $row.find(".editRow, .deleteRow").css("display", "inline-block");
             $row.find(".fEditRow, .cEditRow").css("display", "none");
             $row.find("td").each(function(){
-                $(this).text($(this).find(".original-data").val());
+                $(this).text($(this).find("input").attr('value'));
             });
         });
         $row.find(".fEditRow").on('click', function(){
