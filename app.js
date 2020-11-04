@@ -1,6 +1,5 @@
 const mysql = require("mysql2");
 const express = require("express");
-test
 // express app
 const app = express();
 
