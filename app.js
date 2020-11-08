@@ -1,8 +1,7 @@
 const express = require("express");
 const authRoutes = require("./routes/authRoute");
-const db = require('./dbConnection');
 const cookieParser = require('cookie-parser');
-const {reqAuth, checkUser} = require('./middlewares/authMiddleware');
+const {reqAuth} = require('./middlewares/authMiddleware');
 
 
 // express app
@@ -21,5 +20,5 @@ app.use(express.json());
 app.use(cookieParser());
 
 // User Authentication
-app.get("*", checkUser);
+app.get("*", reqAuth);
 app.use(authRoutes);

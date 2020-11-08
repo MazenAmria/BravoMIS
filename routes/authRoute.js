@@ -1,42 +1,49 @@
-const { Router } = require('express');
+const {Router} = require('express');
 const db = require('../dbConnection');
-const jwt = require('jsonwebtoken');
-const {reqAuth, checkUser} = require('../middlewares/authMiddleware');
+const bcrypt = require('bcrypt')
+const {createToken} = require('../middlewares/authMiddleware');
 const router = Router();
 
-const createToken = (username) => {
-    return jwt.sign({username}, 'sxe)h2Zqvg6@esVyVt-tIllq6D6gR^2@Q&%eXaHqA3!RV*H_+x', {
-        expiresIn: 60 * 60 * 24
-    });
-}
 router.get('/login', (req, res) => {
-    if(res.locals.username == null)
+    if (res.statusCode === 440) {
         res.render('login', {title: 'تسجيل الدخول'});
-    else
+    } else {
         res.redirect('/');
+    }
 });
 
-router.get('/', reqAuth, (req, res) => {
-    res.render('home', {title: 'الرئيسية'});
+router.get('/', (req, res) => {
+    if (res.statusCode === 440) {
+        res.redirect('/login');
+    } else {
+        res.render('home', {title: 'الرئيسية'});
+    }
 });
 
 router.get('/logout', (req, res) => {
-    res.cookie('jwt', '', {maxAge: 1});
+    res.cookie('jwt', '', {maxAge: 0});
     res.redirect('/login');
 });
 
 router.post('/login', (req, res) => {
-    console.log(req.body);
-    db.query(`select * from employees where emp_id = '${req.body.username}'`, (err, results) => {
-        console.log(results);
-        if(results.length == 0 || req.body.password !== results[0].emp_password){
-            res.status(401).send('wrong');
-        }else{
-            const token = createToken(req.body.username);
-            res.cookie('jwt', token, {httpOnly: true, maxAge: 60 * 60 * 24 * 1000});
-            res.status(200).json({username:req.body.username});
-        }
-    });
+    let invalidState = (req.body == null || req.body.username == null || req.body.password == null);
+    if (invalidState) {
+        res.status(401).send('invalid');
+    } else if (req.body.username.includes("'") || req.body.username.includes("#") || req.body.password.includes("'") || req.body.password.includes("#")) {
+        res.status(401).send('suspicious');
+    } else {
+        db.query(`select * from employees where emp_id = '${req.body.username}'`, (err, results) => {
+            if (results.length != 1) {
+                res.status(401).send('wrong');
+            } else {
+                if (bcrypt.compareSync(req.body.password, results[0].emp_password)) {
+                    const token = createToken(results[0].emp_id);
+                    res.cookie('jwt', token, {httpOnly: true, maxAge: 5 * 1000});
+                    res.status(200).json({username:results[0].emp_id});
+                }
+            }
+        });
+    }
 });
 
 module.exports = router;
