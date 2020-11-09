@@ -1,6 +1,6 @@
 const {Router} = require('express');
 const db = require('../dbConnection');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 const {createToken} = require('../middlewares/authMiddleware');
 const router = Router();
 
@@ -25,7 +25,7 @@ router.get('/logout', (req, res) => {
     res.redirect('/login');
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     let invalidState = (req.body == null || req.body.username == null || req.body.password == null);
     if (invalidState) {
         res.status(401).send('invalid');
@@ -40,6 +40,8 @@ router.post('/login', (req, res) => {
                     const token = createToken(results[0].emp_id);
                     res.cookie('jwt', token, {httpOnly: true, maxAge: 5 * 1000});
                     res.status(200).json({username:results[0].emp_id});
+                }else{
+                    res.status(401).send('wrong');
                 }
             }
         });

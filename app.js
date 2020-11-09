@@ -1,6 +1,7 @@
 const express = require("express");
 const authRoutes = require("./routes/authRoute");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 const {reqAuth} = require('./middlewares/authMiddleware');
 
 
