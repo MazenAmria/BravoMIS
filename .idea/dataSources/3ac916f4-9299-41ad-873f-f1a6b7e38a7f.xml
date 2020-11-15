@@ -943,82 +943,84 @@ SELECT|sys.sys_config:null
       <ColNames>emp_id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="295" parent="288" name="vending_date">
+    <column id="295" parent="288" name="process_id">
       <Position>1</Position>
-      <DataType>date|0s</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="296" parent="288" name="vended_item">
-      <Position>2</Position>
       <DataType>varchar(200)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="297" parent="288" name="vended_quantity">
-      <Position>3</Position>
-      <DataType>int|0s</DataType>
-    </column>
-    <column id="298" parent="288" name="vending_price">
-      <Position>4</Position>
-      <DataType>double|0s</DataType>
-    </column>
-    <column id="299" parent="288" name="vendor_id">
-      <Position>5</Position>
-      <DataType>varchar(50)|0s</DataType>
+    <column id="296" parent="288" name="vending_date">
+      <Position>2</Position>
+      <DataType>date|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="300" parent="288" name="supplier_id">
+    <column id="297" parent="288" name="vended_item">
+      <Position>3</Position>
+      <DataType>varchar(200)|0s</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="298" parent="288" name="vended_quantity">
+      <Position>4</Position>
+      <DataType>int|0s</DataType>
+    </column>
+    <column id="299" parent="288" name="vending_price">
+      <Position>5</Position>
+      <DataType>double|0s</DataType>
+    </column>
+    <column id="300" parent="288" name="vendor_id">
       <Position>6</Position>
       <DataType>varchar(50)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="301" parent="288" name="production_date">
+    <column id="301" parent="288" name="supplier_id">
       <Position>7</Position>
-      <DataType>date|0s</DataType>
+      <DataType>varchar(50)|0s</DataType>
+      <NotNull>1</NotNull>
     </column>
-    <column id="302" parent="288" name="expiry_date">
+    <column id="302" parent="288" name="production_date">
       <Position>8</Position>
       <DataType>date|0s</DataType>
     </column>
-    <index id="303" parent="288" name="vendor_id">
+    <column id="303" parent="288" name="expiry_date">
+      <Position>9</Position>
+      <DataType>date|0s</DataType>
+    </column>
+    <index id="304" parent="288" name="vendor_id">
       <ColNames>vendor_id</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="304" parent="288" name="supplier_id">
+    <index id="305" parent="288" name="supplier_id">
       <ColNames>supplier_id</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="305" parent="288" name="PRIMARY">
+    <key id="306" parent="288" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
-      <ColNames>vending_date
-vended_item
-vendor_id
-supplier_id</ColNames>
+      <ColNames>process_id</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="306" parent="288" name="vending_log_ibfk_1">
+    <foreign-key id="307" parent="288" name="vending_log_ibfk_1">
       <ColNames>vendor_id</ColNames>
       <RefTableName>vendors</RefTableName>
       <RefColNames>vendor_id</RefColNames>
     </foreign-key>
-    <foreign-key id="307" parent="288" name="vending_log_ibfk_2">
+    <foreign-key id="308" parent="288" name="vending_log_ibfk_2">
       <ColNames>supplier_id</ColNames>
       <RefTableName>employees</RefTableName>
       <RefColNames>emp_id</RefColNames>
     </foreign-key>
-    <column id="308" parent="289" name="vendor_id">
+    <column id="309" parent="289" name="vendor_id">
       <Position>1</Position>
       <DataType>varchar(50)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="309" parent="289" name="vendor_name">
+    <column id="310" parent="289" name="vendor_name">
       <Position>2</Position>
       <DataType>varchar(50)|0s</DataType>
     </column>
-    <column id="310" parent="289" name="vendor_location">
+    <column id="311" parent="289" name="vendor_location">
       <Position>3</Position>
       <DataType>varchar(50)|0s</DataType>
     </column>
-    <key id="311" parent="289" name="PRIMARY">
+    <key id="312" parent="289" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>vendor_id</ColNames>
       <Primary>1</Primary>
