@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS vendors (
     vendor_location VARCHAR(50)			-- vendor's country
 );
 CREATE TABLE IF NOT EXISTS vending_log (
+    process_id VARCHAR(200),            -- calculated from (vending_date, vended_item, vendor_id, supplier_id) by the server side
 	vending_date DATE NOT NULL,			-- the date on which the item vended
 	vended_item VARCHAR(200) NOT NULL,	-- the id (barcode) of the vended item
     vended_quantity INTEGER,
@@ -21,5 +22,5 @@ CREATE TABLE IF NOT EXISTS vending_log (
     -- FOREIGN KEY (vended_item) REFERENCES items(item_id),
     FOREIGN KEY (vendor_id) REFERENCES vendors(vendor_id),
     FOREIGN KEY (supplier_id) REFERENCES employees(emp_id),
-    PRIMARY KEY (vending_date, vended_item, vendor_id, supplier_id)
+    PRIMARY KEY (process_id)
 );
