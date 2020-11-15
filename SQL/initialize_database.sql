@@ -1,3 +1,3 @@
 -- Initialize the database if uninitialized 
-CREATE DATABASE bravo_supermarket;
+CREATE DATABASE IF NOT EXISTS bravo_supermarket;
 USE bravo_supermarket;
