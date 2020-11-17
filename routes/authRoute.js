@@ -16,7 +16,12 @@ router.get('/', (req, res) => {
     if (res.statusCode === 440) {
         res.redirect('/login');
     } else {
-        res.render('home', {title: 'الرئيسية'});
+        db.query(`select * from employees where emp_id = '${res.locals.username}'`, (err, results) => {
+            results[0].title = 'لوحة التحكم';
+            results[0].location = 'home';
+            console.log(results);
+            res.render('home', results[0]);
+        });
     }
 });
 

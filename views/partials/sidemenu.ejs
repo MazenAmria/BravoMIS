@@ -1,0 +1,19 @@
+<div class="top-header">
+    <div class="top-logo float-right"><img src="images/logo.png"/></div>
+    <div class="log-out float-left"><a id="logout" href="/logout">تسجيل الخروج</a></div>
+</div>
+<header id="sidemenu">
+    <div class="user-details">
+        <h1><span class='user-icon'><i class="far fa-user"></i></span><%= emp_name %></h1>
+        <span>- <%= emp_role %></span>
+    </div>
+    <div class="user-menu">
+        <ul>
+            <li <% if(location == 'home'){ %> class='active'><% } %> <a href="/">تقارير<span class="menu-icon float-left"><i class="fas fa-chart-line"></i></span></a></li>
+            <li><a href="/invoices">الفواتير<span class="menu-icon float-left"><i class="fas fa-receipt"></i></span></a></li>
+            <li><a href="/sales">المبيعات<span class="menu-icon float-left"><i class="fas fa-shopping-cart"></i></span></a></li>
+            <li><a href="/categories">الأصناف<span class="menu-icon float-left"><i class="fas fa-th"></i></span></a></li>
+            <li><a href="/vendors">الموردين<span class="menu-icon float-left"><i class="fas fa-paper-plane"></i></span></a></li>
+        </ul>
+    </div>
+</header>
