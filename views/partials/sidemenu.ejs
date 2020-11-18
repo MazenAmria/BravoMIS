@@ -4,25 +4,13 @@
 </div>
 <header id="sidemenu">
     <div class="user-details">
-        <h1><span class='user-icon'><i class="far fa-user"></i></span><%= name %></h1>
-        <span>- <%= role %></span>
+        <h1><span class='user-icon'><i class="far fa-user"></i></span><%= emp_name %></h1>
+        <span>- <%= emp_role %></span>
     </div>
     <div class="user-menu">
         <ul>
-            <% if(role == 'Manager'){ %> 
-            <li <% if(location == 'home'){ %> class='active'><% } %> <a href="/">تقارير<span class="menu-icon float-left"><i class="fas fa-chart-line"></i></span></a></li>
-            <li><a href="/invoices">الفواتير<span class="menu-icon float-left"><i class="fas fa-receipt"></i></span></a></li>
-            <li><a href="/sales">المبيعات<span class="menu-icon float-left"><i class="fas fa-shopping-cart"></i></span></a></li>
-            <li><a href="/categories">الأصناف<span class="menu-icon float-left"><i class="fas fa-th"></i></span></a></li>
-            <li><a href="/vendors">الموردين<span class="menu-icon float-left"><i class="fas fa-paper-plane"></i></span></a></li>
-            <% } %>
-            <% if(role == 'Supplier'){ %> 
-                <li <% if(location == 'home'){ %> class='active'><% } %> <a href="/">تقارير<span class="menu-icon float-left"><i class="fas fa-chart-line"></i></span></a></li>
-                <li><a href="/categories">الأصناف<span class="menu-icon float-left"><i class="fas fa-th"></i></span></a></li>
-            <% } %>
-            <% if(role == 'Cashier'){ %> 
-                <li <% if(location == 'home'){ %> class='active'><% } %> <a href="/">تقارير<span class="menu-icon float-left"><i class="fas fa-chart-line"></i></span></a></li>
-                <li><a href="/invoices">الفواتير<span class="menu-icon float-left"><i class="fas fa-receipt"></i></span></a></li>
+            <% for (const menuItem of menu) { %>
+                <li <% if(location === menuItem.target){ %> class='active'<% } %>><a href="/<%= menuItem.target %>"><%= menuItem.title %><span class="menu-icon float-left"><i class="<%= menuItem.iconClass %>"></i></span></a></li>
             <% } %>
         </ul>
     </div>
