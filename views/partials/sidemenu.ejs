@@ -9,11 +9,21 @@
     </div>
     <div class="user-menu">
         <ul>
+            <% if(role == 'Manager'){ %> 
             <li <% if(location == 'home'){ %> class='active'><% } %> <a href="/">تقارير<span class="menu-icon float-left"><i class="fas fa-chart-line"></i></span></a></li>
             <li><a href="/invoices">الفواتير<span class="menu-icon float-left"><i class="fas fa-receipt"></i></span></a></li>
             <li><a href="/sales">المبيعات<span class="menu-icon float-left"><i class="fas fa-shopping-cart"></i></span></a></li>
             <li><a href="/categories">الأصناف<span class="menu-icon float-left"><i class="fas fa-th"></i></span></a></li>
             <li><a href="/vendors">الموردين<span class="menu-icon float-left"><i class="fas fa-paper-plane"></i></span></a></li>
+            <% } %>
+            <% if(role == 'Supplier'){ %> 
+                <li <% if(location == 'home'){ %> class='active'><% } %> <a href="/">تقارير<span class="menu-icon float-left"><i class="fas fa-chart-line"></i></span></a></li>
+                <li><a href="/categories">الأصناف<span class="menu-icon float-left"><i class="fas fa-th"></i></span></a></li>
+            <% } %>
+            <% if(role == 'Cashier'){ %> 
+                <li <% if(location == 'home'){ %> class='active'><% } %> <a href="/">تقارير<span class="menu-icon float-left"><i class="fas fa-chart-line"></i></span></a></li>
+                <li><a href="/invoices">الفواتير<span class="menu-icon float-left"><i class="fas fa-receipt"></i></span></a></li>
+            <% } %>
         </ul>
     </div>
 </header>
