@@ -16,12 +16,8 @@ router.get('/', (req, res) => {
     if (res.statusCode === 440) {
         res.redirect('/login');
     } else {
-        db.query(`select emp_name, emp_role from employees where emp_id = '${res.locals.username}'`, (err, results) => {
-            results[0].title = 'لوحة التحكم';
-            results[0].location = 'home';
-            console.log(results);
-            res.render('home', results[0]);
-        });
+        console.log(res.locals);
+        res.render('home', {title: 'لوحة التحكم', name: res.locals.name, role: res.locals.role, location: 'home'});
     }
 });
 
@@ -38,12 +34,12 @@ router.post('/login', (req, res) => {
     } else if (fobiddenText.test(req.body.username) || fobiddenText.test(req.body.password)) {
         res.status(401).send('forbidden');
     } else {
-        db.query(`select emp_password from employees where emp_id = '${req.body.username}'`, (err, results) => {
+        db.query(`select emp_password, emp_name, emp_role from employees where emp_id = '${req.body.username}'`, (err, results) => {
             if (results.length !== 1) {
                 res.status(401).send('wrong');
             } else {
                 if (bcrypt.compareSync(req.body.password, results[0].emp_password)) {
-                    const token = createToken(req.body.username);
+                    const token = createToken(req.body.username, results[0].emp_name, results[0].emp_role);
                     res.cookie('jwt', token, {httpOnly: true, maxAge: 5 * 1000});
                     res.status(200).json({username:req.body.username});
                 }else{

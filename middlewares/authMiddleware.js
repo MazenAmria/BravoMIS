@@ -2,8 +2,8 @@ const jwt = require('jsonwebtoken');
 const tokenAge = 60 * 60;
 const ignored = '/logout';
 
-const createToken = (username) => {
-    return jwt.sign({username}, 'sxe)h2Zqvg6@esVyVt-tIllq6D6gR^2@Q&%eXaHqA3!RV*H_+x', {
+const createToken = (username, name, role) => {
+    return jwt.sign({username, name, role}, 'sxe)h2Zqvg6@esVyVt-tIllq6D6gR^2@Q&%eXaHqA3!RV*H_+x', {
         expiresIn: tokenAge,
     });
 }
@@ -22,9 +22,11 @@ const reqAuth = (req, res, next) => {
                     res.locals.username = null;
                     res.status(440);
                 } else {
-                    const token = createToken(decodedToken.username);
+                    const token = createToken(decodedToken.username, decodedToken.name, decodedToken.role);
                     res.cookie('jwt', token, {httpOnly: true, maxAge: tokenAge * 1000});
                     res.locals.username = decodedToken.username;
+                    res.locals.name = decodedToken.name;
+                    res.locals.role = decodedToken.role;
                 }
             });
         } else {
