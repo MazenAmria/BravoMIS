@@ -7,4 +7,16 @@ const adminMenu = [
     vendors
 ];
 
-module.exports = { adminMenu };
+const supplierMenu = [
+    reports
+];
+
+const cashierMenu = [
+    invoices
+];
+
+const guestMenu = [
+    vendors
+];
+
+module.exports = { adminMenu, supplierMenu, cashierMenu, guestMenu } ;
