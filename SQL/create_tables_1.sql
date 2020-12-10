@@ -1,3 +1,4 @@
+-- BY: MAZEN AMRIA
 CREATE TABLE IF NOT EXISTS employees (
 	emp_id VARCHAR(50) PRIMARY KEY,		    -- username
     emp_password VARCHAR(200) NOT NULL,	    -- encrypted password
@@ -54,3 +55,27 @@ CREATE TABLE IF NOT EXISTS vending_offers (
     FOREIGN KEY (request_id) REFERENCES vending_requests(request_id),
     PRIMARY KEY (offer_id)
 );
+
+
+-- BY: AHMAD KHATIB
+CREATE TABLE IF NOT EXISTS Customers(
+	customer_id int,
+    customer_name varchar(50),
+    date_of_birth Date,
+    class varchar(50),
+    points int,
+    PRIMARY KEY(customer_id)
+);
+CREATE TABLE IF NOT EXISTS Invoices(
+	invoice_id int,
+    total_price varchar(50),
+    invoice_time DATETIME,
+    customer_id int,
+    emp_id VARCHAR(50),
+    PRIMARY KEY(invoice_id),
+    FOREIGN KEY(customer_id) REFERENCES Customers(customer_id),
+    FOREIGN KEY(emp_id) REFERENCES employees(emp_id)
+);
+
+-- BY: SARA SHAABNA
+-- TODO
