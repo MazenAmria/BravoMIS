@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS vending_log (
     supplier_id VARCHAR(50) NOT NULL,	    -- the id of the employee who managed this process
     production_date DATE,
     expiry_date DATE,
-    -- FOREIGN KEY (vended_item) REFERENCES items(item_id),
+    FOREIGN KEY (vended_item) REFERENCES Items(Item_id),
     FOREIGN KEY (vendor_id) REFERENCES vendors(vendor_id),
     FOREIGN KEY (supplier_id) REFERENCES employees(emp_id),
     PRIMARY KEY (process_id)
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS vending_requests (
     manager_id VARCHAR(50) NOT NULL,        -- the id of the manager who requested this item
     supplier_id VARCHAR(50),	            -- the id of the employee who resolved this request
     status VARCHAR(50) DEFAULT 'requested', -- the status of the request [requested|resolved]
-    -- FOREIGN KEY (requested_item) REFERENCES items(item_id),
+    FOREIGN KEY (requested_item) REFERENCES Items(Item_id),
     FOREIGN KEY (manager_id) REFERENCES employees(emp_id),
     FOREIGN KEY (supplier_id) REFERENCES employees(emp_id),
     PRIMARY KEY (request_id)
@@ -78,4 +78,31 @@ CREATE TABLE IF NOT EXISTS Invoices(
 );
 
 -- BY: SARA SHAABNA
--- TODO
+Create Table If Not exists Categories (
+category_id Varchar(50),
+category_name Varchar(50),
+Primary Key(category_id)
+);
+
+Create Table If Not exists Items (
+item_id int,
+item_name Varchar(50) ,
+selling_price double , 
+remaining_quantity int ,
+category_id Varchar(50),
+Primary Key(item_id),
+Foreign Key(category_id) References Categories(category_id) 
+);
+
+Create Table If Not exists bill (
+quantity int,
+price_per_unit double,
+item_id int,
+invoice_id int,
+primary key(item_id,invoive_id),
+Foreign key (item_id) References Items(item_id),
+Foreign key (invoice_id) References Invoices(invoice_id)
+);
+
+
+
