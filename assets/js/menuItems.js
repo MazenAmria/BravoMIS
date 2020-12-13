@@ -18,6 +18,11 @@ const categories = {
     target: 'categories',
     iconClass: 'fas fa-th'
 };
+const vendingRequests = {
+    title: 'طلبات الاستيراد',
+    target: 'vending_requests',
+    iconClass: 'fas fa-paper-plane'
+}
 const vendors = {
     title: 'الموردين',
     target: 'vendors',

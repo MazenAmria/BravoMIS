@@ -1,20 +1,21 @@
-<%- include('./partials/head.ejs') %> 
+<%- include('./partials/head.ejs') %>
 
 <div class="login-container">
     <form id='loginForm'>
         <div class='logo'><img src="images/logo.png"/></div>
         <h2><span class='main-color'>تسجيل</span> الدخول</h2>
         <div class="alert alert-danger alert-dismissible hide" role="alert">
-            <strong>يبدو أن هناك مشكلة!</strong> ربما إسم المستخدم غير موجود أو كلمة المرور خاطئة
+            <strong>يبدو أن هناك مشكلة!</strong> ربما اسم المستخدم غير موجود أو كلمة المرور خاطئة
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">×</span>
             </button>
         </div>
-        <label for='username'>إسم المستخدم</label>
+        <label for='username'>اسم المستخدم</label>
         <input type="text" name="username" class='username' required>
         <label for='password'>كلمة المرور</label>
         <input type="password" name="password" class='password' required>
         <button class='main-background submit-login'>تسجيل الدخول</button>
     </form>
 </div>
+
 <%- include('./partials/footer.ejs') %>
