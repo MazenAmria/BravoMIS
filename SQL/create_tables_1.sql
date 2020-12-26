@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS invoice (
 	invoice_id INTEGER,
     total_price VARCHAR(50),
     invoice_time DATETIME,
-    customer_id INTEGER,
+    customer_id VARCHAR(50),
     cashier_id VARCHAR(50),
     PRIMARY KEY (invoice_id),
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS category (
 );
 
 CREATE TABLE IF NOT EXISTS item (
-    item_id INTEGER,
+    item_id VARCHAR(200),
     item_name VARCHAR(50),
     selling_price DOUBLE,
     remaining_quantity INTEGER,
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS item (
 CREATE TABLE IF NOT EXISTS invoice_includes_item (
     quantity INTEGER NOT NULL,
     price_per_unit DOUBLE NOT NULL,
-    item_id INTEGER,
+    item_id VARCHAR(200),
     invoice_id INTEGER NOT NULL,
     PRIMARY KEY (item_id, invoice_id),
     FOREIGN KEY (item_id) REFERENCES item(item_id),
