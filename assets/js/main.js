@@ -22,6 +22,13 @@ $(document).ready(function(){
             }
         });
     });
-
+    $('#table_id').DataTable({
+        select: {
+            style: 'multi'
+        },
+        language: {
+            url: 'DatatablesArabic.json'
+        }
+    });
     
 });

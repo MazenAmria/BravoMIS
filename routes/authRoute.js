@@ -56,6 +56,7 @@ router.post('/login', (req, res) => {
         res.status(401).send('forbidden');
     } else {
         db.query(`select emp_password, emp_name, emp_role from employees where emp_id = '${req.body.username}'`, (err, results) => {
+            console.log(results);
             if (results.length !== 1) {
                 res.status(401).send('wrong');
             } else {
@@ -70,5 +71,4 @@ router.post('/login', (req, res) => {
         });
     }
 });
-
 module.exports = router;
