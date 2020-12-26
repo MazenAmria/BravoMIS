@@ -55,8 +55,7 @@ router.post('/login', (req, res) => {
     } else if (forbiddenText.test(req.body.username) || forbiddenText.test(req.body.password)) {
         res.status(401).send('forbidden');
     } else {
-        db.query(`select emp_password, emp_name, emp_role from employees where emp_id = '${req.body.username}'`, (err, results) => {
-            console.log(results);
+        db.query(`select emp_password, emp_name, emp_role from employee where emp_id = '${req.body.username}'`, (err, results) => {
             if (results.length !== 1) {
                 res.status(401).send('wrong');
             } else {
