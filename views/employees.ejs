@@ -1,4 +1,183 @@
 <%- include('./partials/head.ejs') %>
+<%- include('./partials/sidemenu.ejs') %>
+<div class='all-wrapper'>
+    <div class='row'>
+        <div class='add-employee-wrapper col-sm-6 col-xs-12'>
+            <div class='add-employee widget'>
+                <div class='widget-title'>
+                    <h2><span>إضافة</span> موظف</h2>
+                </div>
+                <form id='addEmployee'>
+                    <div class="alert alert-danger alert-dismissible hide" role="alert">
+                        <strong>يبدو أن هناك مشكلة!</strong> ربما اسم المستخدم غير موجود أو كلمة المرور خاطئة
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <label for='employeeName'>إسم الموظف</label>
+                    <input type="text" name="employeeName" class='employeeName' required>
+                    <label for='employeeUsername'>اسم المستخدم</label>
+                    <input type="text" name="employeeUsername" class='employeeUsername' required>
+                    <label for='employeePassword'>كلمة المرور</label>
+                    <input type="password" name="employeePassword" class='employeePassword' required>
+                    <label for='employeeRole'>الوظيفة</label>
+                    <select name="employeeRole" class="employeeRole">
+                        <option value="Manager">Manager</option>
+                        <option value="Cashier">Cashier</option>
+                        <option value="Vendor">Vendor</option>
+                        <option value="Guest">Guest</option>
+                    </select>
+                    <button class='main-background submit-employee mbutton'><span><i class="fas fa-plus"></i></span>إضافة الموظف</button>
+                </form>
+            </div>
+        </div>
+        <div class='employees-table-wrapper col-xs-12'>
+            <div class='employees-table widget'>
+                <div class='widget-title'>
+                    <h2>الموظفين</h2>
+                </div>
+                <table id="employeesTable" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <% for(field in employeesTableFields){ %> 
+                                <th><%= employeesTableFields[field] %></th>
+                            <% } %> 
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(row in employeesTableRows){ %>
+                            <tr>
+                                <% for(rowElement in employeesTableRows[row]){ %> 
+                                    <td><%= employeesTableRows[row][rowElement] %></td>
+                                <% } %>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(() => {
+    let a = $.confirm({
+        title: 'Prompt!',
+        autoOpen: true,
+        content: '<div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div></div>',
+        buttons: {
+            formSubmit: {
+                text: 'Submit',
+                btnClass: 'btn-blue',
+                action: function () {
+                    var name = this.$content.find('.name').val();
+                    if(!name){
+                        $.alert('provide a valid name');
+                        return false;
+                    }
+                    $.alert('Your name is ' + name);
+                }
+            },
+            cancel: function () {
+                //close
+            },
+        }
+    });
+    let employeesTable = $('#employeesTable').DataTable({
+        dom: 'Blfrtip',
+        select: {
+            style: 'multi'
+        },
+        language: {
+            url: 'DatatablesArabic.json'
+        },
+        buttons: [
+            {
+                text: 'حذف',
+                attr: {id: 'deleteButton' },
+                enabled: false,
+                action: function ( e, dt, node, config ) {
+                    alert('لاريب');
+                }
+            },
+            {
+                text: 'تعديل',
+                attr: {id: 'editButton' },
+                enabled: false,
+                action: function ( e, dt, node, config ) {
+                    alert('لاريب');
+                }
+            }
+        ]
+    });
+    employeesTable.on('select deselect', function ( e, dt, type, indexes ) {
+        let selectedRows = employeesTable.rows( { selected: true } ).count();
+        console.log(employeesTable.rows( { selected: true } ).data().length);
+        if(selectedRows > 0){
+            employeesTable.button( 0 ).enable(true);
+            employeesTable.button( 1 ).enable(true);
+        }else{
+            employeesTable.button( 0 ).enable(false);
+            employeesTable.button( 1 ).enable(false);
+        }
+    });
+    $('.employeeRole').select2();
+    
+    $(".submit-employee").on("click", (e) => {
+        console.log();
+        e.preventDefault();
+        let employeeName = $('.employeeName').val(),
+            employeeUsername = $('.employeeUsername').val(),
+            employeePassword = $('.employeePassword').val(),
+            employeeRole = ($('.employeeRole').select2('data')[0]).text;
 
+        $.ajax({
+            url: `/submit-employee`,
+            type: `POST`,
+            data: {employeeName, employeeUsername, employeePassword, employeeRole},
+            success: (status) => {
+                employeesTable.row.add([employeeUsername, employeeName, employeeRole]).draw( false );
+                $.alert({
+                    title: 'نجاح!',
+                    icon: 'fas fa-check',
+                    draggable: false,
+                    rtl:true,
+                    closeIcon: true,
+                    type: 'green',
+                    content: 'تمت إضافة الموظف بنجاح',
+                    buttons: {
+                        cancel: {
+                            text: 'حسنا',
+                            action: function () {
 
+                            }
+                        }
+                    }
+                });
+            },
+            error: (err) => {
+                if(err.status == 409){
+                    $.alert({
+                        title: 'أوبس!',
+                        icon: 'fas fa-exclamation-triangle',
+                        draggable: false,
+                        rtl:true,
+                        closeIcon: true,
+                        type: 'red',
+                        content: 'الموظف موجود بالفعل!',
+                        buttons: {
+                            cancel: {
+                                text: 'حسنا',
+                                action: function () {
+
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+});
+</script>
 <%- include('./partials/footer.ejs') %>

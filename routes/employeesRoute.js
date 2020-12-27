@@ -24,12 +24,20 @@ router.get('/employees', (req, res) => {
                 menu = guestMenu;
         }
         if(role == 'manager'){
-            res.render('employees', {
-                title: 'الموظفين',
-                name: res.locals.name,
-                role: res.locals.role,
-                menu: menu,
-                location: 'employees'
+            db.query(`SELECT E.emp_id, E.emp_name, E.emp_role FROM employee E`, (err, results) => {
+                if(err){
+                    console.log(err);
+                }else{
+                    res.render('employees', {
+                        title: 'الموظفين',
+                        name: res.locals.name,
+                        role: res.locals.role,
+                        menu: menu,
+                        location: 'employees',
+                        employeesTableRows: results,
+                        employeesTableFields: ["إسم المستخدم", "إسم الموظف", "الوظيفة"]
+                    });
+                }
             });
         }else{
             res.status(404).send('Not Found');
@@ -37,6 +45,22 @@ router.get('/employees', (req, res) => {
     }
 });
 
+router.post('/submit-employee', async (req, res) => {
+    const salt = await bcrypt.genSalt();
+    let employeeName = req.body.employeeName,
+        employeeUsername = req.body.employeeUsername,
+        employeePassword = await bcrypt.hash(req.body.employeePassword, salt),
+        employeeRole = req.body.employeeRole;
+    
+    db.query(`INSERT INTO employee VALUE('${employeeUsername}', '${employeePassword}', '${employeeName}', '${employeeRole}')`, (err, results) => {
+        if(err){
+            res.status(409).send('Duplicate');
+        }else{
+            res.status(200).send('Success');
+        }
+
+    });
+});
 
 
 
