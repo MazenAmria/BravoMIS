@@ -3,6 +3,11 @@ const reports = {
     target: 'reports',
     iconClass: 'fas fa-chart-line'
 };
+const employees = {
+    title: 'الموظفين',
+    target: 'employees',
+    iconClass: 'fas fa-users'
+};
 const invoices = {
     title: 'الفواتير',
     target: 'invoices',
@@ -29,4 +34,4 @@ const vendors = {
     iconClass: 'fas fa-paper-plane'
 };
 
-module.exports = { reports, invoices, sales, categories, vendors };
+module.exports = { reports, invoices, sales, categories, vendors, employees };

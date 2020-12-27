@@ -1,7 +1,10 @@
 const express = require("express");
 const authRoutes = require("./routes/authRoute");
+const employeesRoute = require("./routes/employeesRoute");
+const errorRoute = require("./routes/errorRoute");
 const cookieParser = require('cookie-parser');
 const {reqAuth} = require('./middlewares/authMiddleware');
+const { employees } = require("./assets/js/menuItems");
 
 
 // express app
@@ -22,3 +25,5 @@ app.use(cookieParser());
 // User Authentication
 app.get("*", reqAuth);
 app.use(authRoutes);
+app.use(employeesRoute);
+app.use(errorRoute);

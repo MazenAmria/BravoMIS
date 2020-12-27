@@ -1,10 +1,11 @@
-const { reports, invoices, sales, categories, vendors } = require('./menuItems');
+const { reports, invoices, sales, categories, vendors, employees } = require('./menuItems');
 const adminMenu = [
     reports,
     invoices,
     sales,
     categories,
-    vendors
+    vendors,
+    employees
 ];
 
 const supplierMenu = [
