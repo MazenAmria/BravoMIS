@@ -23,10 +23,15 @@ const categories = {
     target: 'categories',
     iconClass: 'fas fa-th'
 };
-const vendingRequests = {
+const requests = {
     title: 'طلبات الاستيراد',
-    target: 'vending_requests',
-    iconClass: 'fas fa-paper-plane'
+    target: 'requests',
+    iconClass: 'fas fa-clipboard-list'
+}
+const tenders = {
+    title: 'المناقصات',
+    target: 'tenders',
+    iconClass: 'fas fa-gavel'
 }
 const vendors = {
     title: 'الموردين',
@@ -34,4 +39,4 @@ const vendors = {
     iconClass: 'fas fa-paper-plane'
 };
 
-module.exports = { reports, invoices, sales, categories, vendors, employees };
+module.exports = { reports, invoices, sales, categories, vendors, requests, tenders, employees };

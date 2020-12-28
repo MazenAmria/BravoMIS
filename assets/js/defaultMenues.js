@@ -1,15 +1,18 @@
-const { reports, invoices, sales, categories, vendors, employees } = require('./menuItems');
-const adminMenu = [
+const { reports, invoices, sales, categories, vendors, requests, tenders, employees } = require('./menuItems');
+const managerMenu = [
     reports,
     invoices,
     sales,
     categories,
+    requests,
     vendors,
     employees
 ];
 
 const vendingManagerMenu = [
-    reports
+    requests,
+    tenders,
+    vendors
 ];
 
 const cashierMenu = [
@@ -20,4 +23,4 @@ const guestMenu = [
     vendors
 ];
 
-module.exports = { adminMenu, vendingManagerMenu, cashierMenu, guestMenu } ;
+module.exports = { managerMenu, vendingManagerMenu, cashierMenu, guestMenu } ;

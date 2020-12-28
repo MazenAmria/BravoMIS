@@ -1,4 +1,4 @@
--- BY: MAZEN AMRIA
+-- BY: MAZEN AMRIA (PART 1)
 CREATE TABLE IF NOT EXISTS employee (
 	emp_id VARCHAR(50),		                                -- username
     emp_password VARCHAR(200) NOT NULL,	                    -- encrypted password
@@ -13,60 +13,6 @@ CREATE TABLE IF NOT EXISTS vendor (
     vendor_location VARCHAR(50),    	                    -- vendor's country
     PRIMARY KEY (vendor_id)
 );
-
-CREATE TABLE IF NOT EXISTS vending_log (
-    process_id INTEGER AUTO_INCREMENT,
-	vending_date DATE NOT NULL,			                    -- the date on which the item vended
-	vended_item VARCHAR(200) NOT NULL,	                    -- the id (barcode) of the vended item
-    vended_quantity INTEGER,
-    vendor_id VARCHAR(50) NOT NULL,
-    supplier_id VARCHAR(50) NOT NULL,	                    -- the id of the employee who managed this process
-    FOREIGN KEY (vended_item) REFERENCES item(Item_id),
-    FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id),
-    FOREIGN KEY (supplier_id) REFERENCES employee(emp_id),
-    PRIMARY KEY (process_id)
-);
-
-CREATE TABLE IF NOT EXISTS process_details (
-    vending_date DATE NOT NULL,			                    -- the date on which the item vended
-    vended_item VARCHAR(200) NOT NULL,	                    -- the id (barcode) of the vended item
-    vendor_id VARCHAR(50) NOT NULL,
-    vending_price DOUBLE,
-    production_date DATE,
-    expiry_date DATE,
-    FOREIGN KEY (vended_item) REFERENCES item(item_id),
-    FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id),
-    PRIMARY KEY (vendor_id, vended_item, vending_date)
-);
-
-CREATE TABLE IF NOT EXISTS vending_request (
-    request_id INTEGER AUTO_INCREMENT,
-    requested_item VARCHAR(200) NOT NULL,                   -- the id (barcode) of the requested item
-    quantity INTEGER,
-    before_date DATE,                                       -- the requested items should be vended before date
-    offers_deadline DATETIME,
-    request_time DATETIME,
-    manager_id VARCHAR(50) NOT NULL,                        -- the id of the manager who requested this item
-    supplier_id VARCHAR(50),	                            -- the id of the employee who resolved this request
-    status VARCHAR(50) DEFAULT 'requested',                 -- the status of the request [requested|resolved]
-    FOREIGN KEY (requested_item) REFERENCES item(Item_id),
-    FOREIGN KEY (manager_id) REFERENCES employee(emp_id),
-    FOREIGN KEY (supplier_id) REFERENCES employee(emp_id),
-    PRIMARY KEY (request_id)
-);
-
-CREATE TABLE IF NOT EXISTS vending_offer (
-    offer_id INTEGER AUTO_INCREMENT,
-    request_id INTEGER NOT NULL,
-    vendor_id VARCHAR(50) NOT NULL,
-    vending_price DOUBLE NOT NULL,
-    vending_date DATE,
-    submission_time DATETIME,
-    FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id),
-    FOREIGN KEY (request_id) REFERENCES vending_request(request_id),
-    PRIMARY KEY (offer_id)
-);
-
 
 -- BY: AHMAD KHATIB
 CREATE TABLE IF NOT EXISTS customer (
@@ -120,4 +66,60 @@ CREATE TABLE IF NOT EXISTS invoice_includes_item (
     PRIMARY KEY (item_id, invoice_id),
     FOREIGN KEY (item_id) REFERENCES item(item_id),
     FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id)
+);
+
+-- BY: MAZEN AMRIA (PART 2)
+CREATE TABLE IF NOT EXISTS vending_process (
+    process_id INTEGER AUTO_INCREMENT,
+    vending_date DATE NOT NULL,			                    -- the date on which the item vended
+    vended_item VARCHAR(200) NOT NULL,	                    -- the id (barcode) of the vended item
+    vended_quantity INTEGER,
+    vendor_id VARCHAR(50) NOT NULL,
+    vending_manager_id VARCHAR(50) NOT NULL,	            -- the id of the employee who managed this process
+    vending_price DOUBLE,
+    production_date DATE,
+    expiry_date DATE,
+    FOREIGN KEY (vended_item) REFERENCES item(item_id),
+    FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id),
+    FOREIGN KEY (vending_manager_id) REFERENCES employee(emp_id),
+    PRIMARY KEY (process_id)
+);
+
+CREATE TABLE IF NOT EXISTS tender (
+    tender_id INTEGER NOT NULL,
+    vending_manager_id VARCHAR(50),
+    creation_time DATETIME,
+    deadline DATETIME,
+    FOREIGN KEY (vending_manager_id) REFERENCES employee(emp_id),
+    PRIMARY KEY (tender_id)
+);
+
+CREATE TABLE IF NOT EXISTS vending_request (
+    request_id INTEGER AUTO_INCREMENT,
+    requested_item VARCHAR(200) NOT NULL,                   -- the id (barcode) of the requested item
+    quantity INTEGER,
+    before_date DATE,                                       -- the requested items should be vended before date
+    offers_deadline DATETIME,
+    request_time DATETIME,
+    manager_id VARCHAR(50) NOT NULL,                        -- the id of the manager who requested this item
+    vending_manager_id VARCHAR(50),	                        -- the id of the employee who resolved this request
+    status VARCHAR(50) DEFAULT 'requested',                 -- the status of the request [requested|resolved]
+    tender_id INTEGER,
+    FOREIGN KEY (tender_id) REFERENCES tender(tender_id),
+    FOREIGN KEY (requested_item) REFERENCES item(item_id),
+    FOREIGN KEY (manager_id) REFERENCES employee(emp_id),
+    FOREIGN KEY (vending_manager_id) REFERENCES employee(emp_id),
+    PRIMARY KEY (request_id)
+);
+
+CREATE TABLE IF NOT EXISTS offer (
+    offer_id INTEGER AUTO_INCREMENT,
+    tender_id INTEGER NOT NULL,
+    vendor_id VARCHAR(50) NOT NULL,
+    vending_price DOUBLE NOT NULL,
+    vending_date DATE,
+    submission_time DATETIME,
+    FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id),
+    FOREIGN KEY (tender_id) REFERENCES tender(tender_id),
+    PRIMARY KEY (offer_id)
 );

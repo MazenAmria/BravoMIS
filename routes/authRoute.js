@@ -3,7 +3,7 @@ const db = require('../dbConnection');
 const bcrypt = require('bcrypt');
 const { createToken } = require('../middlewares/authMiddleware');
 const router = Router();
-const { adminMenu, vendingManagerMenu, cashierMenu, guestMenu } = require('../assets/js/defaultMenues')
+const { managerMenu, vendingManagerMenu, cashierMenu, guestMenu } = require('../assets/js/defaultMenues')
 
 router.get('/login', (req, res) => {
     if (res.statusCode === 440) {
@@ -27,7 +27,7 @@ router.get('/', (req, res) => {
                 menu = vendingManagerMenu;
                 break;
             case /.*manager.*/.test(role):
-                menu = adminMenu;
+                menu = managerMenu;
                 break;
             default:
                 menu = guestMenu;

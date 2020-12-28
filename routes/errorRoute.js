@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const router = Router();
-const { adminMenu, vendingManagerMenu, cashierMenu, guestMenu } = require('../assets/js/defaultMenues');
+const { managerMenu, vendingManagerMenu, cashierMenu, guestMenu } = require('../assets/js/defaultMenues');
 
 
 
@@ -15,7 +15,7 @@ router.get("*", (req, res) => {
             menu = vendingManagerMenu;
             break;
         case /.*manager.*/.test(role):
-            menu = adminMenu;
+            menu = managerMenu;
             break;
         default:
             menu = guestMenu;
