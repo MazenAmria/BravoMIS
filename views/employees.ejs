@@ -24,7 +24,7 @@
                     <select name="employeeRole" class="employeeRole">
                         <option value="Manager">Manager</option>
                         <option value="Cashier">Cashier</option>
-                        <option value="Vendor">Vendor</option>
+                        <option value="Vendor">Vending Manager</option>
                         <option value="Guest">Guest</option>
                     </select>
                     <button class='main-background submit-employee mbutton'><span><i class="fas fa-plus"></i></span>إضافة الموظف</button>
@@ -39,15 +39,15 @@
                 <table id="employeesTable" class="display" style="width:100%">
                     <thead>
                         <tr>
-                            <% for(field in employeesTableFields){ %> 
+                            <% for(field in employeesTableFields){ %>
                                 <th><%= employeesTableFields[field] %></th>
-                            <% } %> 
+                            <% } %>
                         </tr>
                     </thead>
                     <tbody>
                         <% for(row in employeesTableRows){ %>
                             <tr>
-                                <% for(rowElement in employeesTableRows[row]){ %> 
+                                <% for(rowElement in employeesTableRows[row]){ %>
                                     <td><%= employeesTableRows[row][rowElement] %></td>
                                 <% } %>
                             </tr>
@@ -121,7 +121,7 @@ $(document).ready(() => {
         }
     });
     $('.employeeRole').select2();
-    
+
     $(".submit-employee").on("click", (e) => {
         console.log();
         e.preventDefault();

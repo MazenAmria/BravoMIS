@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS employee (
 	emp_id VARCHAR(50),		                                -- username
     emp_password VARCHAR(200) NOT NULL,	                    -- encrypted password
     emp_name VARCHAR(50),				                    -- real name
-    emp_role VARCHAR(50) NOT NULL DEFAULT 'Unauthorized',   -- [Manager|Supplier|Cashier|Unauthorized]
+    emp_role VARCHAR(50) NOT NULL DEFAULT 'Unauthorized',   -- [Manager|Vending Manager|Cashier|Guest|Unauthorized]
     PRIMARY KEY (emp_id)
 );
 

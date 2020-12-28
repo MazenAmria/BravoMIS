@@ -8,7 +8,7 @@ const adminMenu = [
     employees
 ];
 
-const supplierMenu = [
+const vendingManagerMenu = [
     reports
 ];
 
@@ -20,4 +20,4 @@ const guestMenu = [
     vendors
 ];
 
-module.exports = { adminMenu, supplierMenu, cashierMenu, guestMenu } ;
+module.exports = { adminMenu, vendingManagerMenu, cashierMenu, guestMenu } ;

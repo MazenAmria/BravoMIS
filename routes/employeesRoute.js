@@ -2,7 +2,7 @@ const { Router } = require('express');
 const db = require('../dbConnection');
 const bcrypt = require('bcrypt');
 const router = Router();
-const { adminMenu, supplierMenu, cashierMenu, guestMenu } = require('../assets/js/defaultMenues');
+const { adminMenu, vendingManagerMenu, cashierMenu, guestMenu } = require('../assets/js/defaultMenues');
 
 router.get('/employees', (req, res) => {
     if (res.statusCode === 440) {
@@ -14,8 +14,8 @@ router.get('/employees', (req, res) => {
             case /.*cashier.*/.test(role):
                 menu = cashierMenu;
                 break;
-            case /.*supplier.*/.test(role):
-                menu = supplierMenu;
+            case /.*vending manager.*/.test(role):
+                menu = vendingManagerMenu;
                 break;
             case /.*manager.*/.test(role):
                 menu = adminMenu;
@@ -35,7 +35,7 @@ router.get('/employees', (req, res) => {
                         menu: menu,
                         location: 'employees',
                         employeesTableRows: results,
-                        employeesTableFields: ["إسم المستخدم", "إسم الموظف", "الوظيفة"]
+                        employeesTableFields: ["إسم المستخدم", "اسم الموظف", "الوظيفة"]
                     });
                 }
             });
@@ -51,7 +51,7 @@ router.post('/submit-employee', async (req, res) => {
         employeeUsername = req.body.employeeUsername,
         employeePassword = await bcrypt.hash(req.body.employeePassword, salt),
         employeeRole = req.body.employeeRole;
-    
+
     db.query(`INSERT INTO employee VALUE('${employeeUsername}', '${employeePassword}', '${employeeName}', '${employeeRole}')`, (err, results) => {
         if(err){
             res.status(409).send('Duplicate');

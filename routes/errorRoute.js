@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const router = Router();
-const { adminMenu, supplierMenu, cashierMenu, guestMenu } = require('../assets/js/defaultMenues');
+const { adminMenu, vendingManagerMenu, cashierMenu, guestMenu } = require('../assets/js/defaultMenues');
 
 
 
@@ -11,8 +11,8 @@ router.get("*", (req, res) => {
         case /.*cashier.*/.test(role):
             menu = cashierMenu;
             break;
-        case /.*supplier.*/.test(role):
-            menu = supplierMenu;
+        case /.*vending manager.*/.test(role):
+            menu = vendingManagerMenu;
             break;
         case /.*manager.*/.test(role):
             menu = adminMenu;
