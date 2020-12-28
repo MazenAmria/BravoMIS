@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS class_points (
 );
 
 CREATE TABLE IF NOT EXISTS invoice (
-	invoice_id INTEGER,
+	invoice_id INTEGER AUTO_INCREMENT,
     total_price VARCHAR(50),
     invoice_time DATETIME,
     customer_id VARCHAR(50),
