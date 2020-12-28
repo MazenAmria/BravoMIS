@@ -35,7 +35,11 @@ router.get('/employees', (req, res) => {
                         menu: menu,
                         location: 'employees',
                         employeesTableRows: results,
-                        employeesTableFields: ["إسم المستخدم", "اسم الموظف", "الوظيفة"]
+                        employeesTableFields: {
+                            emp_id:'إسم المستخدم',
+                            emp_name: 'إسم الموظف',
+                            emp_role: 'الوظيفة'
+                        }
                     });
                 }
             });
@@ -43,6 +47,10 @@ router.get('/employees', (req, res) => {
             res.status(404).send('Not Found');
         }
     }
+});
+
+router.get('/employees/edit', (req, res) => {
+    console.log(req.query);
 });
 
 router.post('/submit-employee', async (req, res) => {

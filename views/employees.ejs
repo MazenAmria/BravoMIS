@@ -39,15 +39,15 @@
                 <table id="employeesTable" class="display" style="width:100%">
                     <thead>
                         <tr>
-                            <% for(field in employeesTableFields){ %>
+                            <% for(field in employeesTableRows[0]){ %> 
                                 <th><%= employeesTableFields[field] %></th>
                             <% } %>
                         </tr>
                     </thead>
                     <tbody>
                         <% for(row in employeesTableRows){ %>
-                            <tr>
-                                <% for(rowElement in employeesTableRows[row]){ %>
+                            <tr rowKey='<%= employeesTableRows[row]['emp_id']%>'>
+                                <% for(rowElement in employeesTableRows[row]){ %> 
                                     <td><%= employeesTableRows[row][rowElement] %></td>
                                 <% } %>
                             </tr>
@@ -60,28 +60,6 @@
 </div>
 <script type="text/javascript">
 $(document).ready(() => {
-    let a = $.confirm({
-        title: 'Prompt!',
-        autoOpen: true,
-        content: '<div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div><div>bla bla bla</div></div>',
-        buttons: {
-            formSubmit: {
-                text: 'Submit',
-                btnClass: 'btn-blue',
-                action: function () {
-                    var name = this.$content.find('.name').val();
-                    if(!name){
-                        $.alert('provide a valid name');
-                        return false;
-                    }
-                    $.alert('Your name is ' + name);
-                }
-            },
-            cancel: function () {
-                //close
-            },
-        }
-    });
     let employeesTable = $('#employeesTable').DataTable({
         dom: 'Blfrtip',
         select: {
@@ -96,7 +74,7 @@ $(document).ready(() => {
                 attr: {id: 'deleteButton' },
                 enabled: false,
                 action: function ( e, dt, node, config ) {
-                    alert('لاريب');
+
                 }
             },
             {
@@ -104,14 +82,20 @@ $(document).ready(() => {
                 attr: {id: 'editButton' },
                 enabled: false,
                 action: function ( e, dt, node, config ) {
-                    alert('لاريب');
+                    let rows = this.rows( { selected: true } ).nodes(),
+                        editRoute = "employees/edit/?";
+                    for(let i = 0; i < rows.length; i++){
+                        editRoute += `${i}=${rows[i].attributes.rowkey.nodeValue}`;
+                        if(i != rows.length - 1)
+                            editRoute += `&`
+                    }
+                    window.open(editRoute, '_blank');
                 }
             }
         ]
     });
     employeesTable.on('select deselect', function ( e, dt, type, indexes ) {
         let selectedRows = employeesTable.rows( { selected: true } ).count();
-        console.log(employeesTable.rows( { selected: true } ).data().length);
         if(selectedRows > 0){
             employeesTable.button( 0 ).enable(true);
             employeesTable.button( 1 ).enable(true);
@@ -120,10 +104,10 @@ $(document).ready(() => {
             employeesTable.button( 1 ).enable(false);
         }
     });
+
     $('.employeeRole').select2();
 
     $(".submit-employee").on("click", (e) => {
-        console.log();
         e.preventDefault();
         let employeeName = $('.employeeName').val(),
             employeeUsername = $('.employeeUsername').val(),
@@ -155,6 +139,7 @@ $(document).ready(() => {
                 });
             },
             error: (err) => {
+                console.log(err);
                 if(err.status == 409){
                     $.alert({
                         title: 'أوبس!',
