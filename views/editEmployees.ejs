@@ -1,0 +1,27 @@
+<%- include('./partials/head.ejs') %>
+<%- include('./partials/sidemenu.ejs') %>
+<div class='all-wrapper'>
+    <div class='widget'>
+        <div class='widget-title'>
+            <h2>تعديل <span>الموظفين</span></h2>
+        </div>
+        <% for(employee in employees){ %>
+            <form id='editEmployee'>
+                <label for='employeeName'>إسم الموظف</label>
+                <input type="text" name="employeeName" class='employeeName' value='<%= employees[employee].emp_name %>' required>
+                <label for='employeeUsername'>اسم المستخدم</label>
+                <input type="text" name="employeeUsername" class='employeeUsername' value='<%= employees[employee].emp_id %>' required>
+                <label for='employeeRole'>الوظيفة</label>
+                <select name="employeeRole" class="employeeRole">
+                    <option value="Manager" <% if(employees[employee].role == 'Manager'){ %> selected <% } %>>Manager</option>
+                    <option value="Cashier" <% if(employees[employee].role == 'Cashier'){ %> selected <% } %>>Cashier</option>
+                    <option value="Vendor" <% if(employees[employee].role == 'Vending Manager'){ %> selected <% } %>>Vending Manager</option>
+                    <option value="Guest" <% if(employees[employee].role == 'Guest'){ %> selected <% } %>>Guest</option>
+                </select>
+                <button class='main-background submit-employee mbutton'><span><i class="fas fa-plus"></i></span>إضافة الموظف</button>
+            </form>
+        <% } %> 
+    </div>
+</div>
+
+<%- include('./partials/footer.ejs') %>
