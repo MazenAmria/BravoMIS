@@ -1,24 +1,30 @@
-<%- include('./partials/head.ejs') %>
-<%- include('./partials/sidemenu.ejs') %>
 <div class="all-wrapper">
-    <form onsubmit="myfunction()">
+    <form onsubmit="showAllRequests()">
         <input type="submit">
     </form>
     <requests-template></requests-template>
 </div>
 <script type="text/javascript">
-    function myfunction() {
+    function showAllRequests() {
         event.preventDefault();
         $.ajax({
-            url: '/requests',
-            method: 'POST',
+            url: '/requests/api',
+            method: 'GET',
             data: {},
-            success: (data, status) => {
-                let ejsData = ejs.render(tableTemplate, {title: 'طلبات الاستيراد', data: data});
+            success: (data) => {
+                let ejsData = ejs.render(tableTemplate, {
+                    title: 'طلبات الاستيراد',
+                    columns: [
+                        'الخانة الأولى',
+                        'الخانة الثانية',
+                        'الخانة الثالثة',
+                        'الخانة الرابعة'
+                    ],
+                    tuples: data
+                });
                 $('requests-template').html(ejsData);
                 styleTables();
             }
         });
     }
 </script>
-<%- include('./partials/footer.ejs') %>

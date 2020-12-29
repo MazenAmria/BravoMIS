@@ -1,4 +1,6 @@
 $(document).ready(function(){
+    const menuItems = [...$('.menu-item')];
+    if(menuItems.length > 0) menuItems[0].click();
     $(".alert").each(function(){
         let $this = $(this);
         $this.find(".close").on('click', function(){
@@ -32,6 +34,18 @@ $(document).ready(function(){
     });
 
 });
+
+function route(path) {
+    event.preventDefault();
+    $.ajax({
+        url: path,
+        method: 'GET',
+        data: {},
+        success: (data, status) => {
+            $('page-template').html(data);
+        }
+    });
+}
 
 function styleTables(options) {
     if (!options) options = {};
@@ -85,15 +99,13 @@ const tableTemplate = `<div class='generic-table widget'>
     <table class="genericTable display" style="width:100%">
         <thead>
         <tr>
-            <% if (data.length > 0) { %>
-                <% for (const column in data[0]) { %>
-                    <th><%= column %></th>
-                <% } %>
+            <% for (const column of columns) { %>
+                <th><%= column %></th>
             <% } %>
         </tr>
         </thead>
         <tbody>
-        <% for (const tuple of data) { %>
+        <% for (const tuple of tuples) { %>
             <tr>
                 <% for (const cell in tuple) { %>
                     <td><%= tuple[cell] %></td>

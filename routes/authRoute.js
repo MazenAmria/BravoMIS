@@ -7,7 +7,7 @@ const { managerMenu, vendingManagerMenu, cashierMenu, guestMenu } = require('../
 
 router.get('/login', (req, res) => {
     if (res.statusCode === 440) {
-        res.render('login', {title: 'تسجيل الدخول'});
+        res.render('login');
     } else {
         res.redirect('/');
     }
@@ -33,11 +33,9 @@ router.get('/', (req, res) => {
                 menu = guestMenu;
         }
         res.render('home', {
-            title: menu[0].title,
             name: res.locals.name,
             role: res.locals.role,
-            menu: menu,
-            location: 'reports'
+            menu: menu
         });
     }
 });

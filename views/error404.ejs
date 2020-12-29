@@ -1,11 +1,8 @@
-<%- include('./partials/head.ejs') %>
-<%- include('./partials/sidemenu.ejs') %>
 <div class='all-wrapper'>
     <div class='error-wrapper'>
         <h1>أوبس<span>!</span></h1>
         <h2>404 - الصفحة غير موجودة</h2>
         <p>من المرجح أنك لا تملك صلاحية الوصول لهذه الصفحة أو أنها غير موجودة.</p>
-        <a href="/">العودة للصفحة الرئيسية</a>
+        <a onclick="$('.menu-item')[0].click();" style="cursor: pointer">العودة للصفحة الرئيسية</a>
     </div>
 </div>
-<%- include('./partials/footer.ejs') %>

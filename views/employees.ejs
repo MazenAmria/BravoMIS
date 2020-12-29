@@ -1,5 +1,3 @@
-<%- include('./partials/head.ejs') %>
-<%- include('./partials/sidemenu.ejs') %>
 <div class='all-wrapper'>
     <div class='row'>
         <div class='add-employee-wrapper col-sm-6 col-xs-12'>
@@ -14,7 +12,7 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <label for='employeeName'>إسم الموظف</label>
+                    <label for='employeeName'>اسم الموظف</label>
                     <input type="text" name="employeeName" class='employeeName' required>
                     <label for='employeeUsername'>اسم المستخدم</label>
                     <input type="text" name="employeeUsername" class='employeeUsername' required>
@@ -39,7 +37,7 @@
                 <table id="employeesTable" class="display" style="width:100%">
                     <thead>
                         <tr>
-                            <% for(field in employeesTableRows[0]){ %> 
+                            <% for(field in employeesTableRows[0]){ %>
                                 <th><%= employeesTableFields[field] %></th>
                             <% } %>
                         </tr>
@@ -47,7 +45,7 @@
                     <tbody>
                         <% for(row in employeesTableRows){ %>
                             <tr rowKey='<%= employeesTableRows[row]['emp_id']%>'>
-                                <% for(rowElement in employeesTableRows[row]){ %> 
+                                <% for(rowElement in employeesTableRows[row]){ %>
                                     <td><%= employeesTableRows[row][rowElement] %></td>
                                 <% } %>
                             </tr>
@@ -165,4 +163,3 @@ $(document).ready(() => {
 
 });
 </script>
-<%- include('./partials/footer.ejs') %>

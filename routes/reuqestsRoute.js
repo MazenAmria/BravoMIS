@@ -7,51 +7,27 @@ router.get('/requests', (req, res) => {
     if (res.statusCode === 440) {
         res.redirect('/login');
     } else if (res.locals.role.toLowerCase().match(/.*vending manager.*/)) {
-        getAllRequests((err, requests) => {
-            if (err) res.redirect('/');
-            else {
-                res.render('vendingManagerRequests', {
-                    title: 'requests',
-                    name: res.locals.name,
-                    role: res.locals.role,
-                    menu: vendingManagerMenu,
-                    location: 'requests',
-                    requests: requests
-                });
-            }
+        res.render('vendingManagerRequests', {
+            name: res.locals.name,
+            role: res.locals.role
         });
     } else if (res.locals.role.toLowerCase().match(/.*manager.*/)) {
-        getAllRequests((err, requests) => {
-            if (err) res.redirect('/');
-            else {
-                res.render('managerRequests', {
-                    title: 'requests',
-                    name: res.locals.name,
-                    role: res.locals.role,
-                    menu: managerMenu,
-                    location: 'requests',
-                    requests: requests
-                });
-            }
+        res.render('managerRequests', {
+            name: res.locals.name,
+            role: res.locals.role
         });
     } else {
         res.status(404).send('Unauthorized');
     }
 });
 
-router.post('/requests', (req, res) =>{
+router.get('/requests/api', (req, res) =>{
     if (res.status === 440) {
         res.redirect('/login');
     } else {
-        res.json([
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'}
-        ]);
+        getAllRequests((err, data) => {
+            res.json(data);
+        });
     }
 });
 

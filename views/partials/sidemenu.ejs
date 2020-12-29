@@ -10,7 +10,17 @@
     <div class="user-menu">
         <ul>
             <% for (const menuItem of menu) { %>
-                <li <% if(location === menuItem.target){ %> class='active'<% } %>><a href="/<%= menuItem.target %>"><%= menuItem.title %><span class="menu-icon float-left"><i class="<%= menuItem.iconClass %>"></i></span></a></li>
+                <li class="menu-item"
+                    onclick="
+                            route('/<%= menuItem.target %>');
+                            [...$('.menu-item')].forEach(item => item.classList.remove('active'));
+                            event.currentTarget.classList.add('active');
+                            "
+                    style="cursor: pointer">
+                    <a>
+                        <%= menuItem.title %><span class="menu-icon float-left"><i class="<%= menuItem.iconClass %>"></i></span>
+                    </a>
+                </li>
             <% } %>
         </ul>
     </div>
