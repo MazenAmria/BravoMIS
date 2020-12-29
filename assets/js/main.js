@@ -108,7 +108,7 @@ const tableTemplate = `<div class='generic-table widget'>
         <% for (const tuple of tuples) { %>
             <tr>
                 <% for (const cell in tuple) { %>
-                    <td><%= tuple[cell] %></td>
+                    <td field='<%= cell %>'><%= tuple[cell] %></td>
                 <% } %>
             </tr>
         <% } %>
