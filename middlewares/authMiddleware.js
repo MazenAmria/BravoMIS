@@ -27,6 +27,7 @@ const reqAuth = (req, res, next) => {
                     res.locals.username = decodedToken.username;
                     res.locals.name = decodedToken.name;
                     res.locals.role = decodedToken.role;
+                    res.status(200);
                 }
             });
         } else {
