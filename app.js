@@ -3,6 +3,7 @@ const authRoutes = require("./routes/authRoute");
 const requestsRoute = require("./routes/reuqestsRoute");
 const employeesRoute = require("./routes/employeesRoute");
 const errorRoute = require("./routes/errorRoute");
+const categoriesRoute = require("./routes/categoriesRoute");
 const cookieParser = require('cookie-parser');
 const {reqAuth} = require('./middlewares/authMiddleware');
 
@@ -27,4 +28,5 @@ app.get("*", reqAuth);
 app.use(authRoutes);
 app.use(requestsRoute)
 app.use(employeesRoute);
+app.use(categoriesRoute);
 app.use(errorRoute);

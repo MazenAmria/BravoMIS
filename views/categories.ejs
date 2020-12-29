@@ -1,0 +1,130 @@
+<div class='all-wrapper'>
+    <div class='row'>
+        <div class='add-category col-sm-6 col-xs-12'>
+            <div class='categoryAdd_ widget widget'>
+                <div class='widget-title'>
+                    <h2>إضافة <span>صنف</span></h2>
+                </div>
+                <form id='addCategory'>
+                    <label for='categoryName'>إسم الصنف</label>
+                    <input type="text" name="categoryName" class='categoryName' required>
+                    <label for='categoryId'>معرف الصنف</label>
+                    <input type="text" name="categoryId" class='categoryId' required>
+                    <button class='main-background submit-category mbutton'><span><i
+                                class="fas fa-plus"></i></span>إضافة الصنف</button>
+                </form>
+            </div>
+        </div>
+        <div class='categories-statistics col-sm-6 col-xs-12'>
+            <div class='widget'>Categories Statistics</div>
+        </div>
+        <div class='categories-table col-xs-12'>
+            <categories-table></categories-table>
+        </div>
+        <div class='add-item col-sm-6 col-xs-12'>
+            <div class=' itemAdd_ widget widget'>
+                
+
+            </div>
+        </div>
+        <div class='items-statistics col-sm-6 col-xs-12'>
+            <div class='widget'>Items statistics</div>
+        </div>
+        <div class='items-table col-xs-12'>
+            <div class='widget'>Items Table</div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(() => {
+        let showAllCategories = () => {
+        $.ajax({
+            url: '/categories/api',
+            method: 'GET',
+            data: {},
+            success: (data) => {
+                let ejsData = ejs.render(tableTemplate, {
+                    title: 'الأصناف',
+                    columns: [
+                        'رمز الصنف',
+                        'إسم الصنف'
+                    ],
+                    tuples: data
+                });
+                $('categories-table').html(ejsData);
+                styleTables({
+                    onDelete: () => {
+
+                    },
+                    onEdit: (e, buttonApi, dt, node, config) => {
+                        console.log(buttonApi.rows( { selected: true } ).nodes());
+                        /*const rows = buttonApi.rows( { selected: true } ).nodes();
+                        editRoute = "employees/edit/?";
+                        for(let i = 0; i < rows.length; i++){
+                            editRoute += `${i}=${rows[i].attributes.rowkey.nodeValue}`;
+                            if(i != rows.length - 1)
+                                editRoute += `&`;
+                        }
+                        window.open(editRoute, '_blank');*/
+                    }
+                });
+            }
+        });
+    }
+    showAllCategories();
+        $(".submit-category").on('click', (e) => {
+            e.preventDefault();
+            let categoryName = $(".categoryName").val(),
+                categoryId = $('.categoryId').val();
+
+            $.ajax({
+                url: `/add-category`,
+                type: `POST`,
+                data: { categoryName, categoryId },
+                success: () => {
+                    showAllCategories();
+                    $.alert({
+                        title: 'تمت العملية بنجاح',
+                        icon: 'fas fa-check-square',
+                        draggable: false,
+                        rtl: true,
+                        closeIcon: true,
+                        type: 'green',
+                        content: 'تمت إضافة الصنف الجديد بنجاح',
+                        buttons: {
+                            cancel: {
+                                text: 'حسناً',
+                                action: function () {
+
+                                }
+                            }
+                        }
+                    });
+
+                },
+                error: (err) => {
+                    console.log(err);
+                    if (err.status == 409) {
+                        $.alert({
+                            title: 'خطأ',
+                            icon: 'fas fa-times-circle',
+                            draggable: false,
+                            rtl: true,
+                            type: 'red',
+                            content: 'انتبه,الصنف موجود بالفعل!',
+                            buttons: {
+                                cancel: {
+                                    text: 'حسناً',
+                                    action: function () {
+
+                                    }
+                                }
+                            }
+                        })
+                    }
+                }
+            });
+
+        });
+    });
+</script>
