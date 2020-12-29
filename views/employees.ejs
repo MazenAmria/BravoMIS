@@ -30,80 +30,55 @@
             </div>
         </div>
         <div class='employees-table-wrapper col-xs-12'>
-            <div class='employees-table widget'>
-                <div class='widget-title'>
-                    <h2>الموظفين</h2>
-                </div>
-                <table id="employeesTable" class="display" style="width:100%">
-                    <thead>
-                        <tr>
-                            <% for(field in employeesTableRows[0]){ %>
-                                <th><%= employeesTableFields[field] %></th>
-                            <% } %>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% for(row in employeesTableRows){ %>
-                            <tr rowKey='<%= employeesTableRows[row]['emp_id']%>'>
-                                <% for(rowElement in employeesTableRows[row]){ %>
-                                    <td><%= employeesTableRows[row][rowElement] %></td>
-                                <% } %>
-                            </tr>
-                        <% } %>
-                    </tbody>
-                </table>
-            </div>
+            <employees-table></employees-table>
+
         </div>
     </div>
 </div>
 <script type="text/javascript">
 $(document).ready(() => {
-    let employeesTable = $('#employeesTable').DataTable({
-        dom: 'Blfrtip',
-        select: {
-            style: 'multi'
-        },
-        language: {
-            url: 'DatatablesArabic.json'
-        },
-        buttons: [
-            {
-                text: 'حذف',
-                attr: {id: 'deleteButton' },
-                enabled: false,
-                action: function ( e, dt, node, config ) {
 
-                }
-            },
-            {
-                text: 'تعديل',
-                attr: {id: 'editButton' },
-                enabled: false,
-                action: function ( e, dt, node, config ) {
-                    let rows = this.rows( { selected: true } ).nodes(),
+    let showAllEmployees =  () => {
+        $.ajax({
+            url: '/employees/api',
+            method: 'GET',
+            data: {},
+            success: (data) => {
+                let ejsData = ejs.render(tableTemplate, {
+                    title: 'الموظفين',
+                    columns: [
+                        'إسم المستخدم',
+                        'إسم الموظف',
+                        'الوظيفة',
+                        'تاريخ التوظيف',
+                        'حالةالموظف'
+                    ],
+                    tuples: data
+                });
+                $('employees-table').html(ejsData);
+                styleTables({
+                    onDelete: () => {
+
+                    },
+                    onEdit: (e, buttonApi, dt, node, config) => {
+                        console.log(buttonApi.rows( { selected: true } ).nodes());
+                        /*const rows = buttonApi.rows( { selected: true } ).nodes();
                         editRoute = "employees/edit/?";
-                    for(let i = 0; i < rows.length; i++){
-                        editRoute += `${i}=${rows[i].attributes.rowkey.nodeValue}`;
-                        if(i != rows.length - 1)
-                            editRoute += `&`
+                        for(let i = 0; i < rows.length; i++){
+                            editRoute += `${i}=${rows[i].attributes.rowkey.nodeValue}`;
+                            if(i != rows.length - 1)
+                                editRoute += `&`;
+                        }
+                        window.open(editRoute, '_blank');*/
                     }
-                    window.open(editRoute, '_blank');
-                }
+                });
             }
-        ]
-    });
-    employeesTable.on('select deselect', function ( e, dt, type, indexes ) {
-        let selectedRows = employeesTable.rows( { selected: true } ).count();
-        if(selectedRows > 0){
-            employeesTable.button( 0 ).enable(true);
-            employeesTable.button( 1 ).enable(true);
-        }else{
-            employeesTable.button( 0 ).enable(false);
-            employeesTable.button( 1 ).enable(false);
-        }
-    });
+        });
+    }
+    showAllEmployees();
 
     $('.employeeRole').select2();
+
 
     $(".submit-employee").on("click", (e) => {
         e.preventDefault();
@@ -111,7 +86,7 @@ $(document).ready(() => {
             employeeUsername = $('.employeeUsername').val(),
             employeePassword = $('.employeePassword').val(),
             employeeRole = ($('.employeeRole').select2('data')[0]).text;
-
+            
         $.ajax({
             url: `/submit-employee`,
             type: `POST`,

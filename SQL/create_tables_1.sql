@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS employee (
     emp_password VARCHAR(200) NOT NULL,	                    -- encrypted password
     emp_name VARCHAR(50),				                    -- real name
     emp_role VARCHAR(50) NOT NULL DEFAULT 'Unauthorized',   -- [Manager|Vending Manager|Cashier|Guest|Unauthorized]
+    emp_registration_date DATE,
+    emp_status VARCHAR(50),                                 -- [مفصول|متقاعد|يعمل]
     PRIMARY KEY (emp_id)
 );
 

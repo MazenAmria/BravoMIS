@@ -4,20 +4,55 @@
             <h2>تعديل <span>الموظفين</span></h2>
         </div>
         <% for(employee in employees){ %>
-            <form id='editEmployee'>
+            <form id='editEmployee<%= employee %>' class='editEmployee'>
                 <label for='employeeName'>إسم الموظف</label>
                 <input type="text" name="employeeName" class='employeeName' value='<%= employees[employee].emp_name %>' required>
                 <label for='employeeUsername'>اسم المستخدم</label>
                 <input type="text" name="employeeUsername" class='employeeUsername' value='<%= employees[employee].emp_id %>' required>
-                <label for='employeeRole'>الوظيفة</label>
-                <select name="employeeRole" class="employeeRole">
-                    <option value="Manager" <% if(employees[employee].role == 'Manager'){ %> selected <% } %>>Manager</option>
-                    <option value="Cashier" <% if(employees[employee].role == 'Cashier'){ %> selected <% } %>>Cashier</option>
-                    <option value="Vendor" <% if(employees[employee].role == 'Vending Manager'){ %> selected <% } %>>Vending Manager</option>
-                    <option value="Guest" <% if(employees[employee].role == 'Guest'){ %> selected <% } %>>Guest</option>
+                <label for='employeeStatus'>الحالة</label>
+                <select name="employeeStatus" class="employeeStatus">
+                    <option value="يعمل" <% if(employees[employee].emp_status == 'يعمل'){ %> selected="true" <% } %>>يعمل</option>
+                    <option value="متقاعد" <% if(employees[employee].emp_status == 'متقاعد'){ %> selected="true" <% } %>>متقاعد</option>
+                    <option value="مفصول" <% if(employees[employee].emp_status == 'مفصول'){ %> selected="true" <% } %>>مفصول</option>
                 </select>
-                <button class='main-background submit-employee mbutton'><span><i class="fas fa-plus"></i></span>إضافة الموظف</button>
             </form>
         <% } %>
+        <button class='submit-edit-employee sbutton'><span><i class="fas fa-save"></i></span>حفظ التعديلات</button>
     </div>
 </div>
+<script type="text/javascript">
+$(document).ready(() => {
+    $('.employeeStatus').select2();
+    $('.submit-edit-employee').on('click', () => {
+        $.alert({
+            title: 'تأكيد',
+            icon: 'fas fa-question',
+            draggable: false,
+            rtl:true,
+            closeIcon: true,
+            type: 'orange',
+            content: 'هل أنت متأكد من حفظ التعديلات ؟',
+            buttons: {
+                ok: {
+                    text: 'نعم',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                        $.ajax({
+                            url: `submit-edit-employees`,
+                            
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'لا',
+                    btnClass: 'btn-yellow',
+                    action: function () {
+
+                    }
+                }
+            }
+        });
+    });
+});
+</script>
+

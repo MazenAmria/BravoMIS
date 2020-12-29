@@ -44,3 +44,40 @@ form select {
 .employees-table-wrapper {
     margin-top: 30px;
 }
+.editEmployee:not(:last-of-type) {
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #eee;
+}
+.sbutton {
+    background-color: #0062cc;
+    border: none;
+    outline: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 7px 12px;
+    border-radius: 3px;
+    margin-top: 20px;
+}
+.sbutton span {
+    margin-left: 5px;
+}
+.delete-cell {
+    text-align: center;
+}
+button.btn {
+    height: 30px;
+    padding: 0 9px;
+    color: #fff;
+    background: #000;
+    border-radius: 3px;
+    border: none;
+    display: inline-block;
+    font-size: 13px;
+}
+button.btn-blue {
+    background-color: #0062cc;
+}
+button.btn-red {
+    background-color: #dc3545;
+}

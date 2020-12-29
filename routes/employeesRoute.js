@@ -25,23 +25,30 @@ router.get('/employees', (req, res) => {
                 menu = guestMenu;
         }
         if(role == 'manager'){
-            db.query(`SELECT E.emp_id, E.emp_name, E.emp_role FROM employee E`, (err, results) => {
+            res.render('employees', {
+                title: 'الموظفين',
+                name: res.locals.name,
+                role: res.locals.role,
+                menu: menu,
+                location: 'employees'
+            });
+        }else{
+            res.status(404).send('Not Found');
+        }
+    }
+});
+router.get('/employees/api', (req, res) => {
+    let role = res.locals.role.toLowerCase();
+    if(res.statusCode === 440){
+        res.redirect('/login');
+    }else{
+        if(role == 'manager'){
+            db.query(`SELECT E.emp_id, E.emp_name, E.emp_role, DATE_FORMAT(E.emp_registration_date, '%Y-%m-%d') AS emp_registration_date, E.emp_status
+                      FROM employee E`, (err, results) => {
                 if(err){
                     console.log(err);
                 }else{
-                    res.render('employees', {
-                        title: 'الموظفين',
-                        name: res.locals.name,
-                        role: res.locals.role,
-                        menu: menu,
-                        location: 'employees',
-                        employeesTableRows: results,
-                        employeesTableFields: {
-                            emp_id:'إسم المستخدم',
-                            emp_name: 'إسم الموظف',
-                            emp_role: 'الوظيفة'
-                        }
-                    });
+                    res.json(results);
                 }
             });
         }else{
@@ -49,7 +56,6 @@ router.get('/employees', (req, res) => {
         }
     }
 });
-
 router.get('/employees/edit', (req, res) => {
     console.log(req.query);
     if (res.statusCode === 440) {
@@ -74,7 +80,7 @@ router.get('/employees/edit', (req, res) => {
             let employeesToEdit = Object.values(req.query);
             let usersArray = `('` + employeesToEdit.join(`','`) + `')`;
             console.log(usersArray);
-            db.query(`SELECT E.emp_id, E.emp_name, E.emp_role FROM employee E WHERE E.emp_id IN ${usersArray}`, (err, results) => {
+            db.query(`SELECT E.emp_id, E.emp_name, E.emp_role, E.emp_status FROM employee E WHERE E.emp_id IN ${usersArray}`, (err, results) => {
                 if(err){
                     console.log(err);
                 }else{
@@ -99,10 +105,13 @@ router.post('/submit-employee', reqAuth, (req, res) => {
     let employeeName = req.body.employeeName,
         employeeUsername = req.body.employeeUsername,
         employeePassword = bcrypt.hashSync(req.body.employeePassword, salt),
-        employeeRole = req.body.employeeRole;
+        employeeRole = req.body.employeeRole,
+        now = new Date(),
+        currentDate = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
 
-    db.query(`INSERT INTO employee VALUE('${employeeUsername}', '${employeePassword}', '${employeeName}', '${employeeRole}')`, (err, results) => {
+    db.query(`INSERT INTO employee VALUE('${employeeUsername}', '${employeePassword}', '${employeeName}', '${employeeRole}', 'يعمل', '2020-12-29')`, (err, results) => {
         if(err){
+            console.log(err);
             res.status(409).send('Duplicate');
         }else{
             res.status(200).send('Success');

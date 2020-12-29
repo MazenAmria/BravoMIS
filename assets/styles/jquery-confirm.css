@@ -618,7 +618,7 @@ body[class*=jconfirm-no-scroll-] {
 .jconfirm.jconfirm-light .jconfirm-box .jconfirm-buttons button {
     text-transform: uppercase;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 400;
     text-shadow: none;
 }
 
@@ -672,7 +672,7 @@ body[class*=jconfirm-no-scroll-] {
     background-image: none;
     text-transform: uppercase;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 400;
     text-shadow: none;
     -webkit-transition: background .1s;
     transition: background .1s;
