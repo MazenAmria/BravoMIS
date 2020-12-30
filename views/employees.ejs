@@ -1,6 +1,6 @@
 <div class='all-wrapper'>
     <div class='row'>
-        <div class='add-employee-wrapper col-sm-6 col-xs-12'>
+        <div class='add-employee-wrapper col-sm-5 col-xs-12'>
             <div class='add-employee widget'>
                 <div class='widget-title'>
                     <h2><span>إضافة</span> موظف</h2>
@@ -29,6 +29,87 @@
                 </form>
             </div>
         </div>
+        <div class='filter-employee-wrapper col-sm-7 col-xs-12'>
+            <div class='filter-employee widget'>
+                <div class='widget-title'>
+                    <h2>فلترة <span>الموظفين</span></h2>
+                </div>
+                <form id='filterEmployee'>
+                    <label for='employeeNameFilter'>اسم الموظف</label>
+                    <input type="text" name="employeeNameFilter" class='employeeNameFilter'>
+                    <label for='employeeUsernameFilter'>اسم المستخدم</label>
+                    <input type="text" name="employeeUsernameFilter" class='employeeUsernameFilter'>
+                    <label for='employeeRoleFilter'>الوظيفة</label>
+                    <select name="employeeRoleFilter" class="employeeRoleFilter">
+                        <option value="all">الكل</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Cashier">Cashier</option>
+                        <option value="Vendor">Vending Manager</option>
+                        <option value="Guest">Guest</option>
+                    </select>
+                    <label for='regDate' class="regDateLabel">تاريخ التوظيف</label>
+                    <div class='regDate row clearfix'>
+                        <div class="col-xs-6">
+                            <div class="row-medium">
+                                <div>
+                                    <span class="clearfix col-xs-12">من</span>
+                                    <div class='col-xs-3'>
+                                        <select class="startDate-d">
+                                            <% for(let i = 1; i <= 31; i++){ %>
+                                                <option value='<%= i %>' <% if(i == employeesDates.minDay){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-3'>
+                                        <select class="startDate-m">
+                                            <% for(let i = 1; i <= 12; i++){ %>
+                                                <option value='<%= i %>' <% if(i == employeesDates.minMonth){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-6'>
+                                        <select class="startDate-y">
+                                            <% for(let i = employeesDates.minYear; i <= employeesDates.maxYear; i++){ %>
+                                                <option value='<%= i %>' <% if(i == employeesDates.minYear){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="row-medium">
+                                <div>
+                                    <span class="clearfix col-xs-12">إلى</span>
+                                    <div class='col-xs-3'>
+                                        <select class="endDate-d">
+                                            <% for(let i = 1; i <= 31; i++){ %>
+                                                <option value='<%= i %>' <% if(i == employeesDates.maxDay){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-3'>
+                                        <select class="endDate-m">
+                                            <% for(let i = 1; i <= 12; i++){ %>
+                                                <option value='<%= i %>' <% if(i == employeesDates.maxMonth){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-6'>
+                                        <select class="endDate-y">
+                                            <% for(let i = employeesDates.minYear; i <= employeesDates.maxYear; i++){ %>
+                                                <option value='<%= i %>' <% if(i == employeesDates.maxYear){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class='main-background filter-employee-button sbutton'><span><i class="fas fa-search"></i></span>فلترة</button>
+                </form>
+            </div>
+        </div>
         <div class='employees-table-wrapper col-xs-12'>
             <employees-table></employees-table>
         </div>
@@ -36,12 +117,13 @@
 </div>
 <script type="text/javascript">
 $(document).ready(() => {
-
-    let showAllEmployees =  () => {
+    
+    let showAllEmployees =  (filter) => {
+        if(!filter) filter = {}
         $.ajax({
             url: '/employees/api',
             method: 'GET',
-            data: {},
+            data: filter,
             success: (data) => {
                 let ejsData = ejs.render(tableTemplate, {
                     title: 'الموظفين',
@@ -50,15 +132,89 @@ $(document).ready(() => {
                         'إسم الموظف',
                         'الوظيفة',
                         'تاريخ التوظيف',
-                        'حالةالموظف'
+                        'حالة الموظف'
                     ],
                     tuples: data,
                     tableCount: 0
                 });
                 $('employees-table').html(ejsData);
                 styleTables({
-                    onDelete: () => {
+                    onDelete: (e, buttonApi, dt, node, config) => {
+                        $.alert({
+                            title: 'تأكيد!',
+                            icon: 'fas fa-exclamation-triangle',
+                            draggable: false,
+                            rtl:true,
+                            closeIcon: true,
+                            type: 'red',
+                            content: 'هل أنت متأكد من رغبتك بحذف الموظفين!',
+                            buttons: {
+                                yes: {
+                                    text: 'نعم',
+                                    btnClass: 'btn-red',
+                                    action: function () {
+                                        const rows = buttonApi.rows( { selected: true } ).nodes();
+                                        deleteEmployees = [];
+                                        for(let i = 0; i < rows.length; i++){
+                                            for(let j = 0; j < rows[i].children.length; j++){
+                                                if(rows[i].children[j].attributes[0].nodeValue == 'emp_id'){
+                                                    deleteEmployees.push(rows[i].children[j].innerText);
+                                                }
+                                            }
+                                        }
+                                        $.ajax({
+                                            url: `employees/delete`,
+                                            type: `DELETE`,
+                                            data: {deleteEmployees},
+                                            success: (msg) => {
+                                                $.alert({
+                                                    title: 'نجاح!',
+                                                    icon: 'fas fa-check',
+                                                    draggable: false,
+                                                    rtl:true,
+                                                    closeIcon: true,
+                                                    type: 'green',
+                                                    content: 'تم حذف الموظفين بنجاح!',
+                                                    buttons: {
+                                                        cancel: {
+                                                            text: 'حسنا',
+                                                            action: function () {
+                                                                showAllEmployees();
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            },
+                                            error: (err) => {
+                                                $.alert({
+                                                    title: 'فشل!',
+                                                    icon: 'fas fa-exclamation-triangle',
+                                                    draggable: false,
+                                                    rtl:true,
+                                                    closeIcon: true,
+                                                    type: 'orange',
+                                                    content: 'يبدو أنك تحاول حذف موظفين مرتبطين بسجلات المتجر, الرجاء إزالة تظليلهم',
+                                                    buttons: {
+                                                        cancel: {
+                                                            text: 'حسنا',
+                                                            action: function () {
 
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                },
+                                no: {
+                                    text: 'لا',
+                                    action: function () {
+
+                                    }
+                                }
+                            }
+                        });
                     },
                     onEdit: (e, buttonApi, dt, node, config) => {   
                         const rows = buttonApi.rows( { selected: true } ).nodes();
@@ -81,49 +237,45 @@ $(document).ready(() => {
     showAllEmployees();
 
     $('.employeeRole').select2();
+    $('.employeeRoleFilter').select2();
+    $('.filter-employee-button').on('click', (event) => {
+        event.preventDefault();
+        employeeNameFilter = $('.employeeNameFilter').val(),
+        employeeUsernameFilter = $('.employeeUsernameFilter').val(),
+        employeeRole = ($('.employeeRoleFilter').select2('data')[0]).id,
+        startDateD = $('.startDate-d').val(),
+        startDateM = $('.startDate-m').val(),
+        startDateY = $('.startDate-y').val(),
+        endDateD = $('.endDate-d').val(),
+        endDateM = $('.endDate-m').val(),
+        endDateY = $('.endDate-y').val();
+
+        if(employeeRole.match('all'))
+            employeeRole = '';
+        console.log({employeeNameFilter, employeeUsernameFilter, employeeRole, startDateD, startDateM, startDateY, endDateD, endDateM, endDateY});
+        showAllEmployees({employeeNameFilter, employeeUsernameFilter, employeeRole, startDateD, startDateM, startDateY, endDateD, endDateM, endDateY});
+    });
 
     $(".submit-employee").on("click", (e) => {
         e.preventDefault();
         let employeeName = $('.employeeName').val(),
             employeeUsername = $('.employeeUsername').val(),
             employeePassword = $('.employeePassword').val(),
-            employeeRole = ($('.employeeRole').select2('data')[0]).text;
-            
-        $.ajax({
-            url: `/submit-employee`,
-            type: `POST`,
-            data: {employeeName, employeeUsername, employeePassword, employeeRole},
-            success: (status) => {
-                employeesTable.row.add([employeeUsername, employeeName, employeeRole]).draw( false );
-                $.alert({
-                    title: 'نجاح!',
-                    icon: 'fas fa-check',
-                    draggable: false,
-                    rtl:true,
-                    closeIcon: true,
-                    type: 'green',
-                    content: 'تمت إضافة الموظف بنجاح',
-                    buttons: {
-                        cancel: {
-                            text: 'حسنا',
-                            action: function () {
-
-                            }
-                        }
-                    }
-                });
-            },
-            error: (err) => {
-                console.log(err);
-                if(err.status == 409){
+            employeeRole = ($('.employeeRole').select2('data')[0]).id;
+        if(employeeName.length > 0 && employeeUsername.length > 0 && employeePassword.length > 0 && employeeRole.length > 0){
+            $.ajax({
+                url: `/submit-employee`,
+                type: `POST`,
+                data: {employeeName, employeeUsername, employeePassword, employeeRole},
+                success: (status) => {
                     $.alert({
-                        title: 'أوبس!',
-                        icon: 'fas fa-exclamation-triangle',
+                        title: 'نجاح!',
+                        icon: 'fas fa-check',
                         draggable: false,
                         rtl:true,
                         closeIcon: true,
-                        type: 'red',
-                        content: 'الموظف موجود بالفعل!',
+                        type: 'green',
+                        content: 'تمت إضافة الموظف بنجاح',
                         buttons: {
                             cancel: {
                                 text: 'حسنا',
@@ -133,9 +285,49 @@ $(document).ready(() => {
                             }
                         }
                     });
+                },
+                error: (err) => {
+                    console.log(err);
+                    if(err.status == 409){
+                        $.alert({
+                            title: 'أوبس!',
+                            icon: 'fas fa-exclamation-triangle',
+                            draggable: false,
+                            rtl:true,
+                            closeIcon: true,
+                            type: 'red',
+                            content: 'الموظف موجود بالفعل!',
+                            buttons: {
+                                cancel: {
+                                    text: 'حسنا',
+                                    action: function () {
+
+                                    }
+                                }
+                            }
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }else{
+            $.alert({
+                title: 'فشل!',
+                icon: 'fas fa-exclamation-triangle',
+                draggable: false,
+                rtl:true,
+                closeIcon: true,
+                type: 'orange',
+                content: 'يبدو أنك تركت أحد المدخلات فارغًا!',
+                buttons: {
+                    cancel: {
+                        text: 'إغلاق',
+                        action: function () {
+
+                        }
+                    }
+                }
+            });
+        }
     });
 
 });

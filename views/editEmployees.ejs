@@ -49,10 +49,42 @@ $(document).ready(() => {
                             type: `POST`,
                             data: {employeesToEdit},
                             success: () => {
-
+                                $.alert({
+                                    title: 'نجاح!',
+                                    icon: 'fas fa-check',
+                                    draggable: false,
+                                    rtl:true,
+                                    closeIcon: true,
+                                    type: 'green',
+                                    content: 'تم تعديل الموظفين بنجاح',
+                                    buttons: {
+                                        cancel: {
+                                            text: 'حسنا',
+                                            action: function () {
+                                                route('/employees');
+                                            }
+                                        }
+                                    }
+                                });
                             },
                             error: () => {
+                                $.alert({
+                                    title: 'أوبس!',
+                                    icon: 'fas fa-exclamation-triangle',
+                                    draggable: false,
+                                    rtl:true,
+                                    closeIcon: true,
+                                    type: 'red',
+                                    content: 'حدث خطأ أثناء تحديث الموظفين!',
+                                    buttons: {
+                                        cancel: {
+                                            text: 'حسنا',
+                                            action: function () {
 
+                                            }
+                                        }
+                                    }
+                                });
                             }
                         });
                     }

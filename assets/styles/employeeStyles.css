@@ -81,3 +81,9 @@ button.btn-blue {
 button.btn-red {
     background-color: #dc3545;
 }
+.regDate select {
+    padding: 0 5px;
+}
+.regDateLabel {
+    margin-top: 15px;
+}
