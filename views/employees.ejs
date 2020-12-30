@@ -31,7 +31,6 @@
         </div>
         <div class='employees-table-wrapper col-xs-12'>
             <employees-table></employees-table>
-
         </div>
     </div>
 </div>
@@ -53,32 +52,35 @@ $(document).ready(() => {
                         'تاريخ التوظيف',
                         'حالةالموظف'
                     ],
-                    tuples: data
+                    tuples: data,
+                    tableCount: 0
                 });
                 $('employees-table').html(ejsData);
                 styleTables({
                     onDelete: () => {
 
                     },
-                    onEdit: (e, buttonApi, dt, node, config) => {
-                        console.log(buttonApi.rows( { selected: true } ).nodes());
-                        /*const rows = buttonApi.rows( { selected: true } ).nodes();
+                    onEdit: (e, buttonApi, dt, node, config) => {   
+                        const rows = buttonApi.rows( { selected: true } ).nodes();
                         editRoute = "employees/edit/?";
                         for(let i = 0; i < rows.length; i++){
-                            editRoute += `${i}=${rows[i].attributes.rowkey.nodeValue}`;
+                            for(let j = 0; j < rows[i].children.length; j++){
+                                if(rows[i].children[j].attributes[0].nodeValue == 'emp_id'){
+                                    editRoute += `${i}=${rows[i].children[j].innerText}`;
+                                }
+                            }
                             if(i != rows.length - 1)
                                 editRoute += `&`;
                         }
-                        window.open(editRoute, '_blank');*/
+                        route(editRoute);
                     }
-                });
+                }, 0);
             }
         });
     }
     showAllEmployees();
 
     $('.employeeRole').select2();
-
 
     $(".submit-employee").on("click", (e) => {
         e.preventDefault();

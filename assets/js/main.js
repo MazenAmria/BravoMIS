@@ -47,7 +47,7 @@ function route(path) {
     });
 }
 
-function styleTables(options) {
+function styleTables(options, tableCount) {
     if (!options) options = {};
     if (!options.onDelete) options.onDelete = function ( e, dt, node, config ) {
         alert('لاريب');
@@ -55,7 +55,7 @@ function styleTables(options) {
     if (!options.onEdit) options.onEdit = function ( e, dt, node, config ) {
         alert('لاريب');
     }
-    let table = $('.genericTable').DataTable({
+    let table = $(`.genericTable${tableCount}`).DataTable({
         dom: 'Blfrtip',
         select: {
             style: 'multi'
@@ -96,7 +96,7 @@ const tableTemplate = `<div class='generic-table widget'>
     <div class='widget-title'>
         <h2><%= title %></h2>
     </div>
-    <table class="genericTable display" style="width:100%">
+    <table class="genericTable<%= tableCount %> display" style="width:100%">
         <thead>
         <tr>
             <% for (const column of columns) { %>

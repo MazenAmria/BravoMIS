@@ -8,7 +8,7 @@
                 <label for='employeeName'>إسم الموظف</label>
                 <input type="text" name="employeeName" class='employeeName' value='<%= employees[employee].emp_name %>' required>
                 <label for='employeeUsername'>اسم المستخدم</label>
-                <input type="text" name="employeeUsername" class='employeeUsername' value='<%= employees[employee].emp_id %>' required>
+                <input type="text" name="employeeUsername" disabled class='employeeUsername' value='<%= employees[employee].emp_id %>' required>
                 <label for='employeeStatus'>الحالة</label>
                 <select name="employeeStatus" class="employeeStatus">
                     <option value="يعمل" <% if(employees[employee].emp_status == 'يعمل'){ %> selected="true" <% } %>>يعمل</option>
@@ -37,15 +37,28 @@ $(document).ready(() => {
                     text: 'نعم',
                     btnClass: 'btn-blue',
                     action: function () {
+                        let employeesToEdit = [];
+                        $.each($(".editEmployee"), (index, record) => {
+                            let employeeName = $(record).find(".employeeName").val(),
+                                employeeUsername = $(record).find(".employeeUsername").val(),
+                                employeeStatus = ($(record).find('.employeeStatus').select2('data')[0]).text;
+                            employeesToEdit.push({employeeName, employeeUsername, employeeStatus});
+                        });
                         $.ajax({
-                            url: `submit-edit-employees`,
-                            
+                            url: `/submit-edit-employees`,
+                            type: `POST`,
+                            data: {employeesToEdit},
+                            success: () => {
+
+                            },
+                            error: () => {
+
+                            }
                         });
                     }
                 },
                 cancel: {
                     text: 'لا',
-                    btnClass: 'btn-yellow',
                     action: function () {
 
                     }
