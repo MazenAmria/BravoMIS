@@ -19,6 +19,38 @@
     $(document).ready(() => {
         $('.h-nav-item')[0].click();
     });
+    function popUp(path) {
+        event.preventDefault();
+        $.ajax({
+            url: '/api/tenders/open/t.mazenamria',
+            method: 'GET',
+            success: (data) => {
+                let ejsData = ejs.render(popUpTemplate, {
+                    title: 'المناقصات',
+                    tableCount: 1,
+                    columns: data.columns,
+                    tuples: data.tuples
+                });
+                $('pop-up-template').html(ejsData);
+                styleTables({}, 1);
+            },
+            error: (xhr, ajaxOptions, thrownError) => {
+                let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});
+                $('pop-up-template').html(ejsData);
+            }
+        });
+    }
+    function renderLinks() {
+        [...$('td')].filter(item => item.getAttribute('field') === 'offers').forEach((item) => {
+            let path = `/${item.innerHTML}`;
+            let text = 'أنقر هنا لرؤية كافة العروض';
+            item.innerHTML = `
+                <a class="d-link" onclick="popUp('${path}');" style="cursor: pointer;">
+                    <i class="fas fa-clipboard-list"></i> ${text}
+                </a>
+            `;
+        });
+    }
     function showTenders(path, method) {
         event.preventDefault();
         $.ajax({
@@ -29,16 +61,12 @@
                 let ejsData = ejs.render(tableTemplate, {
                     title: 'المناقصات',
                     tableCount: 0,
-                    columns: [
-                        'الخانة الأولى',
-                        'الخانة الثانية',
-                        'الخانة الثالثة',
-                        'الخانة الرابعة'
-                    ],
-                    tuples: data
+                    columns: data.columns,
+                    tuples: data.tuples
                 });
                 $('tenders-template').html(ejsData);
                 styleTables({}, 0);
+                renderLinks();
             },
             error: (xhr, ajaxOptions, thrownError) => {
                 let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});

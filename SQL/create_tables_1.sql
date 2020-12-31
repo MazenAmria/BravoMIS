@@ -88,10 +88,11 @@ CREATE TABLE IF NOT EXISTS vending_process (
 );
 
 CREATE TABLE IF NOT EXISTS tender (
-    tender_id INTEGER NOT NULL,
+    tender_id INTEGER NOT NULL AUTO_INCREMENT,
     vending_manager_id VARCHAR(50),
     creation_time DATETIME,
     deadline DATETIME,
+    status VARCHAR(50),                                     -- the status of the tender [open|closed|resolved]
     FOREIGN KEY (vending_manager_id) REFERENCES employee(emp_id),
     PRIMARY KEY (tender_id)
 );

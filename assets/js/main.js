@@ -123,3 +123,17 @@ const errTemplate = `<div class="widget">
         <h2><span><%= errCode %></span> <%= errMessage %></h2>
     </div>
 </div>`;
+
+const popUpTemplate = `<div class="pop-up widget">
+    ${tableTemplate}
+</div>`;
+
+function hidePopUp() {
+    let popUps = [...$('.pop-up')];
+    if(popUps.length > 0)
+        if (event.clientX < popUps[0].offsetLeft ||
+            event.clientX > (popUps[0].offsetLeft + popUps[0].offsetWidth) ||
+            event.clientY < popUps[0].offsetTop ||
+            event.clientY > (popUps[0].offsetTop + popUps[0].offsetHeight))
+            $('pop-up-template').html('');
+}
