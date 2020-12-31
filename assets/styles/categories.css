@@ -11,3 +11,20 @@
 button.main-background.submit-Item.mbutton {
     margin-top: 5px;
 }
+.add-category .widget-title > span {
+    display: block;
+    margin: 10px 0;
+}
+form#addCategory {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
+.categoryChoose {
+    width: 100%;
+}
+form.edit-item:not(:last-of-type) {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}

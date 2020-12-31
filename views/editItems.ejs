@@ -1,0 +1,101 @@
+<div class='all-wrapper'>
+    <div class='widget'>
+        <div class='widget-title'>
+            <h2>تعديل <span>المنتجات</span></h2>
+        </div>
+        <% for(item in items){ %>
+            <form class='edit-item'>
+                <label for='itemNameEdit'>إسم المنتج</label>
+                <input type="text" name="itemNameEdit" value='<%= items[item].item_name %>' class='itemNameEdit' required>
+                <label for='itemIdEdit'>معرف المنتج</label>
+                <input type="text" name="itemIdEdit" value='<%= items[item].item_id %>' class='itemIdEdit' disabled>
+                <label for='itemPriceEdit'>السعر</label>
+                <input type="text" name="itemPriceEdit"  value='<%= items[item].selling_price %>' class='itemPriceEdit' required>
+                <label for='itemQuantityEdit'>الكمية المتبقية</label>
+                <input type="text" name="itemQuantityEdit" value='<%= items[item].remaining_quantity %>' class='itemQuantityEdit' disabled>
+                <label for="categoryName2Edit">إسم الصنف</label>
+                <input type="text" name="categoryName2Edit" value='<%= items[item].category_name %>' class='categoryName2Edit' disabled>
+            </form>
+        <% } %>
+        <button class='submit-edit-item sbutton'><span><i class="fas fa-save"></i></span>حفظ التعديلات</button>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(() => {
+    $('.submit-edit-item').on('click', () => {
+        $.alert({
+            title: 'تأكيد',
+            icon: 'fas fa-quesion',
+            draggable: false,
+            rtl:true,
+            closeIcon: true,
+            type: 'blue',
+            content: 'هل أنت متأكد من حفظ التعديلات ؟',
+            buttons: {
+                ok: {
+                    text: 'نعم',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                        let itemsToEdit = [];
+                        $.each($(".edit-item"), (index, record) => {
+                            let itemNameEdit = $(record).find(".itemNameEdit").val(),
+                                itemIdEdit = $(record).find(".itemIdEdit").val(),
+                                itemPriceEdit = $(record).find(".itemPriceEdit").val();
+                                itemsToEdit.push({itemNameEdit, itemIdEdit, itemPriceEdit});
+                        });
+                        $.ajax({
+                            url: `/submit-edit-items`,
+                            type: `POST`,
+                            data: {itemsToEdit},
+                            success: () => {
+                                $.alert({
+                                    title: 'تمت العملية بنجاح',
+                                    icon: 'fas fa-check-square',
+                                    draggable: false,
+                                    rtl:true,
+                                    closeIcon: true,
+                                    type: 'green',
+                                    content: 'تم تعديل المنتج/المنتجات بنجاح',
+                                    buttons: {
+                                        cancel: {
+                                            text: 'حسناً',
+                                            action: function () {
+                                                route('/categories');
+                                            }
+                                        }
+                                    }
+                                });
+                            },
+                            error: () => {
+                                $.alert({
+                                    title: 'خطأ',
+                                    icon: 'fas fa-exclamation-triangle',
+                                    draggable: false,
+                                    rtl:true,
+                                    closeIcon: true,
+                                    type: 'red',
+                                    content: 'حدث خطأ أثناء تحديث المنتجات',
+                                    buttons: {
+                                        cancel: {
+                                            text: 'حسناً',
+                                            action: function () {
+
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'لا',
+                    action: function () {
+
+                    }
+                }
+            }
+        });
+    });
+});
+</script>

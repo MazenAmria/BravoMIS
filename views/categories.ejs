@@ -1,7 +1,7 @@
 <div class='all-wrapper'>
     <div class='row'>
         <div class='add-category col-sm-6 col-xs-12'>
-            <div class='categoryAdd_ widget widget'>
+            <div class='category-add-show widget'>
                 <div class='widget-title'>
                     <h2>إضافة <span>صنف</span></h2>
                 </div>
@@ -13,65 +13,195 @@
                     <button class='main-background submit-category mbutton'><span><i
                                 class="fas fa-plus"></i></span>إضافة الصنف</button>
                 </form>
+
+                <div class='widget-title'>
+                    <h2> الأصناف <span>المتاحة</span></h2>
+                    <span>اختر الصنف الذي تريده ليظهر لك المنتجات الموجودة في الجدول </span>
+                </div>
+                <select name="categoryChoose" class="categoryChoose">
+                    <option value='all'>جميع الأصناف</option>
+                    <% for(key in categories){ %>
+                        <option value='<%= categories[key].category_id %>'>
+                            <%= categories[key].category_name %>
+                        </option>
+                        <% } %>
+                </select>
             </div>
-        </div>
-        <div class='categories-statistics col-sm-6 col-xs-12'>
-            <div class='widget'>Categories Statistics</div>
-        </div>
-        <div class='categories-table col-xs-12'>
-            <categories-table></categories-table>
         </div>
         <div class='add-item col-sm-6 col-xs-12'>
             <div class=' itemAdd_ widget widget'>
-                
+                <div class='widget-title'>
+                    <h2>إضافة <span>منتج</span></h2>
+                </div>
+                <form id='addItem'>
+                    <label for='itemName'>إسم المنتج</label>
+                    <input type="text" name="itemName" class='itemName' required>
+                    <label for='itemId'>معرف المنتج</label>
+                    <input type="text" name="itemId" class='itemId' required>
+                    <label for='itemPrice'>السعر</label>
+                    <input type="text" name="itemPrice" class='itemPrice' required>
+                    <label for="categoryName2">إسم الصنف</label>
+                    <select name="categoryName2" class="categoryName2">
+                        <% for(key in categories){ %>
+                            <option value='<%= categories[key].category_id %>'>
+                                <%= categories[key].category_name %>
+                            </option>
+                            <% } %>
+                    </select>
+                    <button class='main-background submit-item mbutton'><span><i class="fas fa-plus"></i></span>إضافة
+                        منتج</button>
+                </form>
 
             </div>
         </div>
-        <div class='items-statistics col-sm-6 col-xs-12'>
-            <div class='widget'>Items statistics</div>
-        </div>
         <div class='items-table col-xs-12'>
-            <div class='widget'>Items Table</div>
+            <items-table></items-table>
         </div>
     </div>
+
+
+</div>
 </div>
 <script>
     $(document).ready(() => {
-        let showAllCategories = () => {
-        $.ajax({
-            url: '/categories/api',
-            method: 'GET',
-            data: {},
-            success: (data) => {
-                let ejsData = ejs.render(tableTemplate, {
-                    title: 'الأصناف',
-                    columns: [
-                        'رمز الصنف',
-                        'إسم الصنف'
-                    ],
-                    tuples: data
-                });
-                $('categories-table').html(ejsData);
-                styleTables({
-                    onDelete: () => {
+        let showAllItems = (update) => {
+            if (!update) update = {};
+            $.ajax({
+                url: '/items/api',
+                method: 'GET',
+                data: update,
+                success: (data) => {
+                    let ejsData = ejs.render(tableTemplate, {
+                        title: 'المنتجات',
+                        columns: [
+                            'معرف المنتج',
+                            'إسم المنتج',
+                            'سعر المنتج',
+                            'الكمية المتوفرة',
+                            'الصنف'
+                        ],
+                        tuples: data,
+                        tableCount: 0
+                    });
+                    $('items-table').html(ejsData);
+                    styleTables({
+                        onDelete: (e, buttonApi, dt, node, config) => {
+                            $.alert({
+                                title: 'تأكيد!',
+                                icon: 'fas fa-exclamation-triangle',
+                                draggable: false,
+                                rtl: true,
+                                closeIcon: true,
+                                type: 'red',
+                                content: 'هل أنت متأكد من رغبتك بحذف المنتجات ؟',
+                                buttons: {
+                                    yes: {
+                                        text: 'نعم',
+                                        btnClass: 'btn-red',
+                                        action: function () {
+                                            const rows = buttonApi.rows({ selected: true }).nodes();
+                                            deleteItems = [];
+                                            for (let i = 0; i < rows.length; i++) {
+                                                for (let j = 0; j < rows[i].children.length; j++) {
+                                                    if (rows[i].children[j].attributes[0].nodeValue == 'item_id') {
+                                                        deleteItems.push(rows[i].children[j].innerText);
+                                                    }
+                                                }
+                                            }
+                                            $.ajax({
+                                                url: `items/delete`,
+                                                type: `DELETE`,
+                                                data: {deleteItems},
+                                                success: (msg) => {
+                                                    $.alert({
+                                                        title: 'نجاح!',
+                                                        icon: 'fas fa-check',
+                                                        draggable: false,
+                                                        rtl: true,
+                                                        closeIcon: true,
+                                                        type: 'green',
+                                                        content: 'تم حذف المنتجات بنجاح!',
+                                                        buttons: {
+                                                            cancel: {
+                                                                text: 'حسنا',
+                                                                action: function () {
+                                                                    showAllItems();
 
-                    },
-                    onEdit: (e, buttonApi, dt, node, config) => {
-                        console.log(buttonApi.rows( { selected: true } ).nodes());
-                        /*const rows = buttonApi.rows( { selected: true } ).nodes();
-                        editRoute = "employees/edit/?";
-                        for(let i = 0; i < rows.length; i++){
-                            editRoute += `${i}=${rows[i].attributes.rowkey.nodeValue}`;
-                            if(i != rows.length - 1)
-                                editRoute += `&`;
+                                                                }
+                                                            }
+                                                        }
+
+                                                    });
+
+                                                },
+                                                error: (err) => {
+                                                    $.alert({
+                                                        title: 'فشل!',
+                                                        icon: 'fas fa-exclamation-triangle',
+                                                        draggable: false,
+                                                        rtl: true,
+                                                        closeIcon: true,
+                                                        type: 'orange',
+                                                        content: 'يبدو أنك تحاول حذف منتجات مرتبطة بسجلات البيع, الرجاء إزالة تظليلهم',
+                                                        buttons: {
+                                                            cancel: {
+                                                                text: 'حسناً',
+                                                                action: function () {
+
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+
+                                                }
+
+
+                                            });
+
+                                        }
+                                    },
+                                    no: {
+                                        text: 'لا',
+                                        action: function () {
+
+                                        }
+                                    }
+
+                                }
+
+                            });
+                        },
+                        onEdit: (e, buttonApi, dt, node, config) => {
+                            const rows = buttonApi.rows({ selected: true }).nodes();
+                            console.log(rows);
+                            editRoute = "items/edit/?";
+                            for (let i = 0; i < rows.length; i++) {
+                                for (let j = 0; j < rows[i].children.length; j++) {
+                                    if (rows[i].children[j].attributes[0].nodeValue == 'item_id') {
+                                        editRoute += `${i}=${rows[i].children[j].innerText}`;
+                                    }
+                                }
+                                if (i != rows.length - 1)
+                                    editRoute += `&`;
+                            }
+                            route(editRoute);
                         }
-                        window.open(editRoute, '_blank');*/
-                    }
-                });
-            }
+                    }, 0);
+                }
+            });
+        }
+        showAllItems();
+        $(".categoryChoose").select2();
+        $(".categoryChoose").on('select2:select', () => {
+            let categoryId = $('.categoryChoose').select2('data')[0].element.value;
+            if (categoryId == 'all')
+                showAllItems();
+            else
+                showAllItems({ categoryId });
         });
-    }
-    showAllCategories();
+        $(".categoryName2").select2();
+
+        // Adding new category
         $(".submit-category").on('click', (e) => {
             e.preventDefault();
             let categoryName = $(".categoryName").val(),
@@ -82,7 +212,6 @@
                 type: `POST`,
                 data: { categoryName, categoryId },
                 success: () => {
-                    showAllCategories();
                     $.alert({
                         title: 'تمت العملية بنجاح',
                         icon: 'fas fa-check-square',
@@ -90,12 +219,12 @@
                         rtl: true,
                         closeIcon: true,
                         type: 'green',
-                        content: 'تمت إضافة الصنف الجديد بنجاح',
+                        content: 'تم إضافة الصنف الجديد بنجاح',
                         buttons: {
                             cancel: {
                                 text: 'حسناً',
                                 action: function () {
-
+                                    route('/categories');
                                 }
                             }
                         }
@@ -124,7 +253,69 @@
                     }
                 }
             });
+        });
+
+
+
+        $(".submit-item").on('click', (e) => {
+            e.preventDefault();
+            let itemId = $(".itemId").val(),
+                categoryId = $(".categoryName2").select2('data')[0].element.value,
+                itemName = $(".itemName").val(),
+                itemPrice = $(".itemPrice").val();
+
+            $.ajax({
+                url: `/add-item`,
+                type: `POST`,
+                data: { itemId, categoryId, itemName, itemPrice },
+                success: () => {
+                    $.alert({
+                        title: 'تمت العملية بنجاح',
+                        icon: 'fas fa-check-square',
+                        draggable: false,
+                        rtl: true,
+                        closeIcon: true,
+                        type: 'green',
+                        content: 'تم إضافة المنتج الجديد بنجاح',
+                        buttons: {
+                            cancel: {
+                                text: 'حسناً',
+                                action: function () {
+                                    showAllItems();
+                                }
+                            }
+                        }
+                    });
+
+                },
+                error: (err) => {
+                    console.log(err);
+                    if (err.status == 409) {
+                        $.alert({
+                            title: 'خطأ',
+                            icon: 'fas fa-times-circle',
+                            draggable: false,
+                            rtl: true,
+                            type: 'red',
+                            content: 'انتبه,المنتج موجود بالفعل!',
+                            buttons: {
+                                cancel: {
+                                    text: 'حسناً',
+                                    action: function () {
+
+                                    }
+                                }
+                            }
+                        })
+                    }
+                }
+            });
+
 
         });
+
+
+
     });
+
 </script>
