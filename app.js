@@ -1,6 +1,7 @@
 const express = require("express");
 const authRoutes = require("./routes/authRoute");
 const requestsRoute = require("./routes/reuqestsRoute");
+const tendersRoute = require("./routes/tendersRoute");
 const employeesRoute = require("./routes/employeesRoute");
 const errorRoute = require("./routes/errorRoute");
 const categoriesRoute = require("./routes/categoriesRoute");
@@ -26,7 +27,8 @@ app.use(cookieParser());
 // User Authentication
 app.get("*", reqAuth);
 app.use(authRoutes);
-app.use(requestsRoute)
+app.use(requestsRoute);
+app.use(tendersRoute);
 app.use(employeesRoute);
 app.use(categoriesRoute);
 app.use(errorRoute);

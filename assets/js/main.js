@@ -49,11 +49,13 @@ function route(path) {
 
 function styleTables(options, tableCount) {
     if (!options) options = {};
-    if (!options.onDelete) options.onDelete = function ( e, dt, node, config ) {
-        alert('لاريب');
+    if (!options.onDelete) options.onDelete = function ( e, buttonApi, dataTable, node, config )  {
+        let selectedRows = buttonApi.rows( {selected: true} ).data();
+        for (let i = 0; i < selectedRows.length; i++) console.log(selectedRows[i]);
     }
-    if (!options.onEdit) options.onEdit = function ( e, dt, node, config ) {
-        alert('لاريب');
+    if (!options.onEdit) options.onEdit = function ( e, buttonApi, dataTable, node, config )  {
+        let selectedRows = buttonApi.rows( {selected: true} ).data();
+        for (let i = 0; i < selectedRows.length; i++) console.log(selectedRows[i]);
     }
     let table = $(`.genericTable${tableCount}`).DataTable({
         dom: 'Blfrtip',
@@ -114,4 +116,10 @@ const tableTemplate = `<div class='generic-table widget'>
         <% } %>
         </tbody>
     </table>
+</div>`;
+
+const errTemplate = `<div class="widget">
+    <div class="widget-title">
+        <h2><span><%= errCode %></span> <%= errMessage %></h2>
+    </div>
 </div>`;

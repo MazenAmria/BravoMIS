@@ -20,13 +20,13 @@ router.get('/', (req, res) => {
         let menu;
         let role = res.locals.role.toLowerCase();
         switch (true) {
-            case /.*cashier.*/.test(role):
+            case /cashier/.test(role):
                 menu = cashierMenu;
                 break;
-            case /.*vending manager.*/.test(role):
+            case /vending manager/.test(role):
                 menu = vendingManagerMenu;
                 break;
-            case /.*manager.*/.test(role):
+            case /manager/.test(role):
                 menu = managerMenu;
                 break;
             default:

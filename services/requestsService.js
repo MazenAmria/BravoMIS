@@ -1,18 +1,38 @@
 const db = require('../dbConnection');
 
-const getAllRequests = function getAllRequests(callback) {
-    db.query(`SELECT * FROM vending_request;`, (err, results) => {
+const getAllUnresolvedRequests = function getAllUnresolvedRequests(callback) {
+    db.query(`SELECT * FROM vending_request WHERE status LIKE 'requested';`, (err, results) => {
         if (err) callback(err, null);
-        callback(null, [
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'},
-            {Test1: 'Test', Test2: 'Test', Test3: 'Test', Test4: 'Test'}
-        ]);
+        callback(null, results);
     });
 }
 
-module.exports = { getAllRequests };
+const getOwnUnresolvedRequests = function getOwnUnresolvedRequests(username, callback) {
+    db.query(`SELECT * FROM vending_request WHERE manager_id LIKE '${username}' AND status LIKE 'requested';`, (err, results) => {
+        if (err) callback(err, null);
+        callback(null, results);
+    });
+}
+
+const getOwnResolvedRequests = function getOwnResolvedRequests(username, callback) {
+    db.query(`SELECT * FROM vending_request WHERE manager_id LIKE '${username}' AND status LIKE 'resolved';`, (err, results) => {
+        if (err) callback(err, null);
+        callback(null, results);
+    });
+}
+
+const getAssignedRequests = function getAssignedRequests(username, callback) {
+    db.query(`SELECT * FROM vending_request WHERE vending_manager_id LIKE '${username}' AND status LIKE 'assigned';`, (err, results) => {
+        if (err) callback(err, null);
+        callback(null, results);
+    });
+}
+
+const getResolvedRequests = function getResolvedRequests(username, callback) {
+    db.query(`SELECT * FROM vending_request WHERE vending_manager_id LIKE '${username}' AND status LIKE 'resolved';`, (err, results) => {
+        if (err) callback(err, null);
+        callback(null, results);
+    });
+}
+
+module.exports = { getAllUnresolvedRequests, getOwnUnresolvedRequests, getOwnResolvedRequests, getAssignedRequests, getResolvedRequests };

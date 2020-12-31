@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS vending_request (
     request_time DATETIME,
     manager_id VARCHAR(50) NOT NULL,                        -- the id of the manager who requested this item
     vending_manager_id VARCHAR(50),	                        -- the id of the employee who resolved this request
-    status VARCHAR(50) DEFAULT 'requested',                 -- the status of the request [requested|resolved]
+    status VARCHAR(50) DEFAULT 'requested',                 -- the status of the request [requested|assigned|resolved]
     tender_id INTEGER,
     FOREIGN KEY (tender_id) REFERENCES tender(tender_id),
     FOREIGN KEY (requested_item) REFERENCES item(item_id),

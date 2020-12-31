@@ -1,0 +1,49 @@
+<div class="all-wrapper">
+    <div class="row" style="margin-bottom: 20px;">
+        <ul class="widget h-nav">
+            <% for (const tab of tabs) { %>
+                <li class="h-nav-item"
+                    onclick="
+                            showTenders('/<%= tab.path %>', '<%= tab.method %>');
+                            [...$('.h-nav-item')].forEach(item => item.classList.remove('active'));
+                            event.currentTarget.classList.add('active');
+                            "><%= tab.title %></li>
+            <% } %>
+        </ul>
+    </div>
+    <div class="row">
+        <tenders-template></tenders-template>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(() => {
+        $('.h-nav-item')[0].click();
+    });
+    function showTenders(path, method) {
+        event.preventDefault();
+        $.ajax({
+            url: path,
+            method: method,
+            data: {},
+            success: (data) => {
+                let ejsData = ejs.render(tableTemplate, {
+                    title: 'المناقصات',
+                    tableCount: 0,
+                    columns: [
+                        'الخانة الأولى',
+                        'الخانة الثانية',
+                        'الخانة الثالثة',
+                        'الخانة الرابعة'
+                    ],
+                    tuples: data
+                });
+                $('tenders-template').html(ejsData);
+                styleTables({}, 0);
+            },
+            error: (xhr, ajaxOptions, thrownError) => {
+                let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});
+                $('tenders-template').html(ejsData);
+            }
+        });
+    }
+</script>

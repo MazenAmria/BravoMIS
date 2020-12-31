@@ -40,7 +40,7 @@ img{border: 0;max-width: 100%;display: block;}
 
 /* TRANSITION
 ------------------------------ */
-input[type="text"], input[type="email"], input[type="password"], a, button {
+input[type="text"], input[type="email"], input[type="password"], a, button, .h-nav-item {
     transition:all .25s;
     -webkit-transition:all .25s;
     -o-transition:all .25s;
@@ -56,7 +56,7 @@ input[type="text"], input[type="email"], input[type="password"], a, button {
     url("../fonts/DIN Next LT Arabic Regular.woff2") format("woff2"),
     url("../fonts/DIN Next LT Arabic Regular.woff") format("woff"),
     url("../fonts/DIN Next LT Arabic Regular.ttf") format("truetype"),
-    url("../fonts/DIN Next LT Arabic Regular.svg#DIN Next LT Arabic") format("svg"); 
+    url("../fonts/DIN Next LT Arabic Regular.svg#DIN Next LT Arabic") format("svg");
 }
 
 /* LOGIN FORM
@@ -245,6 +245,12 @@ span.user-icon {
     margin-right: 240px;
     margin-top: 80px;
     padding: 30px;
+    position: fixed;
+    overflow-y: scroll;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
 
 div.dataTables_wrapper {
@@ -302,4 +308,40 @@ span.select-info {
 }
 .error-wrapper a {
     display: inline-block;
+}
+
+/* Horizontal Tabs
+--------------------------------------- */
+.h-nav {
+    display: flex;
+}
+.h-nav-item {
+    cursor: pointer;
+    margin: 0;
+    font-size: 17px;
+    padding: 10px 20px;
+    border-radius: 15px;
+}
+.h-nav-item:hover {
+    color: var(--main);
+}
+.h-nav-item.active {
+    background: #f5f5f5;
+    color: var(--main);
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--main);
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--darkMain);
 }
