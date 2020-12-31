@@ -114,8 +114,8 @@ router.post('/submit-employee', reqAuth, (req, res) => {
                 employeePassword = bcrypt.hashSync(req.body.employeePassword, salt),
                 employeeRole = req.body.employeeRole,
                 now = new Date(),
-                currentDate = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-
+                currentDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+                console.log(currentDate);
             db.query(`INSERT INTO employee VALUE('${employeeUsername}', '${employeePassword}', '${employeeName}', '${employeeRole}', 'يعمل', '${currentDate}')`, (err, results) => {
                 if(err){
                     console.log(err);
