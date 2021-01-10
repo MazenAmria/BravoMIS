@@ -1,9 +1,10 @@
-const { reports, invoices, sales, categories, vendors, requests, tenders, employees } = require('./menuItems');
+const { reports, invoices, sales, categories, vendors, requests, tenders, employees, customers } = require('./menuItems');
 const managerMenu = [
     reports,
     invoices,
     sales,
     categories,
+    customers,
     requests,
     vendors,
     employees

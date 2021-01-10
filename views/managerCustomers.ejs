@@ -1,0 +1,262 @@
+<div class='all-wrapper'>
+
+    <div class="row">
+        <div class='add-customer-wrapper col-sm-6'>
+            <div class='widget'>
+                <div class='widget-title'>
+                    <h2>إضافة <span>زبون</span></h2>
+                </div>
+                <form id='addCustomer'>
+                    <label for='customerName'>اسم الزبون</label>
+                    <input type="text" name="customerName" class='customerName' required>
+                    <label for='customerId'>معرف الزبون</label>
+                    <input type="text" name="customerId" class='customerId' required>
+                    <label for='customerBirthDate'>تاريخ ولادة الزبون</label>
+                    <div class='customerBirthDate row clearfix'>
+                        <div class="col-xs-12">
+                            <div class="row-medium">
+                                <div>
+                                    <div class='col-xs-3'>
+                                        <select class="endDate-d">
+                                            <% for(let i = 1; i <= 31; i++){ %>
+                                                <option value='<%= i %>'><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-3'>
+                                        <select class="endDate-m">
+                                            <% for(let i = 1; i <= 12; i++){ %>
+                                                <option value='<%= i %>'><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-6'>
+                                        <select class="endDate-y">
+                                            <% for(let i = currentDate.getFullYear() - 100; i <= currentDate.getFullYear(); i++){ %>
+                                                <option value='<%= i %>'><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class='main-background submit-customer mbutton'><span><i class="fas fa-plus"></i></span>إضافة الزبون</button>
+                </form>
+            </div>
+        </div>
+        <div class='customer-table-wrapper col-sm-12'>
+            <cusotmers-table></cusotmers-table>
+        </div>
+    </div>
+
+
+</div>
+<script type="text/javascript">
+$(document).ready(() => {
+    let showAllCustomers =  (filter) => {
+        if(!filter) filter = {}
+        $.ajax({
+            url: '/customers/api',
+            method: 'GET',
+            data: filter,
+            success: (data) => {
+                let ejsData = ejs.render(tableTemplate, {
+                    title: 'الزبائن',
+                    columns: [
+                        'معرف الزبون',
+                        'إسم الزبون',
+                        'تاريخ الميلاد'
+                    ],
+                    tuples: data,
+                    tableCount: 0
+                });
+                $('cusotmers-table').html(ejsData);
+                styleTables({
+                    onDelete: (e, buttonApi, dt, node, config) => {
+                        $.alert({
+                            title: 'تأكيد!',
+                            icon: 'fas fa-exclamation-triangle',
+                            draggable: false,
+                            rtl:true,
+                            closeIcon: true,
+                            type: 'red',
+                            content: 'هل أنت متأكد من رغبتك بحذف الزبائن!',
+                            buttons: {
+                                yes: {
+                                    text: 'نعم',
+                                    btnClass: 'btn-red',
+                                    action: function () {
+                                        const rows = buttonApi.rows( { selected: true } ).nodes();
+                                        deleteCustomers = [];
+                                        for(let i = 0; i < rows.length; i++){
+                                            for(let j = 0; j < rows[i].children.length; j++){
+                                                if(rows[i].children[j].attributes[0].nodeValue == 'customer_id'){
+                                                    deleteCustomers.push(rows[i].children[j].innerText);
+                                                }
+                                            }
+                                        }
+                                        $.ajax({
+                                            url: `/customers/delete`,
+                                            type: `DELETE`,
+                                            data: {deleteCustomers},
+                                            success: (msg) => {
+                                                $.alert({
+                                                    title: 'نجاح!',
+                                                    icon: 'fas fa-check',
+                                                    draggable: false,
+                                                    rtl:true,
+                                                    closeIcon: true,
+                                                    type: 'green',
+                                                    content: 'تم حذف الموظفين بنجاح!',
+                                                    buttons: {
+                                                        cancel: {
+                                                            text: 'حسنا',
+                                                            action: function () {
+                                                                showAllCustomers();
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            },
+                                            error: (err) => {
+                                                $.alert({
+                                                    title: 'فشل!',
+                                                    icon: 'fas fa-exclamation-triangle',
+                                                    draggable: false,
+                                                    rtl:true,
+                                                    closeIcon: true,
+                                                    type: 'orange',
+                                                    content: 'يبدو أنك تحاول حذف زبائن مرتبطين بسجلات المتجر, الرجاء إزالة تظليلهم',
+                                                    buttons: {
+                                                        cancel: {
+                                                            text: 'حسنا',
+                                                            action: function () {
+
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                },
+                                no: {
+                                    text: 'لا',
+                                    action: function () {
+
+                                    }
+                                }
+                            }
+                        });
+                    },
+                    onEdit: (e, buttonApi, dt, node, config) => {   
+                        const rows = buttonApi.rows( { selected: true } ).nodes();
+                        editRoute = "customers/edit/";
+                            for(let j = 0; j < rows[0].children.length; j++){
+                                if(rows[0].children[j].attributes[0].nodeValue == 'customer_id'){
+                                    editRoute += rows[0].children[j].innerText;
+                                }
+                            }
+                        route(editRoute);
+                    }
+                }, 0);
+            }
+        });
+    }
+    showAllCustomers();
+
+    $(".submit-customer").on("click", (e) => {
+        e.preventDefault();
+        let customerName = $('.customerName').val(),
+        customerId = $('.customerId').val(),
+        customerBirthDate = `${$('.customerBirthDate .endDate-y').val()}-${$('.customerBirthDate .endDate-m').val()}-${$('.customerBirthDate .endDate-d').val()}`;
+        if(customerName.length > 0 && customerId.length > 0){
+            $.ajax({
+                url: `/submit-customer`,
+                type: `POST`,
+                data: {customerName, customerId, customerBirthDate},
+                success: (status) => {
+                    showAllCustomers();
+                    $.alert({
+                        title: 'نجاح!',
+                        icon: 'fas fa-check',
+                        draggable: false,
+                        rtl:true,
+                        closeIcon: true,
+                        type: 'green',
+                        content: 'تمت إضافة الزبون بنجاح',
+                        buttons: {
+                            cancel: {
+                                text: 'حسنا',
+                                action: function () {
+
+                                }
+                            }
+                        }
+                    });
+                },
+                error: (err) => {
+                    console.log(err);
+                    if(err.status == 409){
+                        $.alert({
+                            title: 'أوبس!',
+                            icon: 'fas fa-exclamation-triangle',
+                            draggable: false,
+                            rtl:true,
+                            closeIcon: true,
+                            type: 'red',
+                            content: 'الزبون موجود بالفعل!',
+                            buttons: {
+                                cancel: {
+                                    text: 'حسنا',
+                                    action: function () {
+
+                                    }
+                                }
+                            }
+                        });
+                    }else if(err.status == 422){
+                        $.alert({
+                            title: 'أوبس!',
+                            icon: 'fas fa-exclamation-triangle',
+                            draggable: false,
+                            rtl:true,
+                            closeIcon: true,
+                            type: 'red',
+                            content: 'التاريخ الذي أدخلته خاطئ!',
+                            buttons: {
+                                cancel: {
+                                    text: 'حسنا',
+                                    action: function () {
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }else{
+            $.alert({
+                title: 'فشل!',
+                icon: 'fas fa-exclamation-triangle',
+                draggable: false,
+                rtl:true,
+                closeIcon: true,
+                type: 'orange',
+                content: 'يبدو أنك تركت أحد المدخلات فارغًا!',
+                buttons: {
+                    cancel: {
+                        text: 'إغلاق',
+                        action: function () {
+
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+});
+</script>

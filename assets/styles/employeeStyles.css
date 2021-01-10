@@ -44,7 +44,7 @@ form select {
 .employees-table-wrapper {
     margin-top: 30px;
 }
-.editEmployee:not(:last-of-type) {
+.editEmployee:not(:last-of-type), .editCustomer:not(:last-of-type), .editDiscount:not(:last-of-type) {
     margin-bottom: 30px;
     padding-bottom: 30px;
     border-bottom: 1px solid #eee;
@@ -86,4 +86,14 @@ button.btn-red {
 }
 .regDateLabel {
     margin-top: 15px;
+}
+.discountDate select {
+    padding-right: 3px;
+    padding-left: 0;
+}
+.customer-table-wrapper, .discount-table-wrapper {
+    margin-top: 30px;
+}
+.editDiscounts .discountDate {
+    margin-bottom: 15px;
 }

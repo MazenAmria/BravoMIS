@@ -1,0 +1,125 @@
+<div class='all-wrapper'>
+    <div class='widget'>
+        <div class='widget-title'>
+            <h2>تعديل <span>الموظفين</span></h2>
+        </div>
+        <form id='editCustomer' class='editCustomer'>
+            <label for='customerName'>اسم الزبون</label>
+            <input type="text" name="customerName" value='<%= customers[0].customer_name %>' class='customerName' required>
+            <label for='customerId'>معرف الزبون</label>
+            <input type="text" name="customerId" value='<%= customers[0].customer_id %>' class='customerId' disabled required>
+            <label for='customerBirthDate'>تاريخ ولادة الزبون</label>
+            <div class='customerBirthDate row clearfix'>
+                <div class="col-xs-12">
+                    <div class="row-medium">
+                        <div>
+                            <div class='col-xs-3'>
+                                <select class="endDate-d">
+                                    <% for(let i = 1; i <= 31; i++){ %>
+                                        <option value='<%= i %>' <% if(i == customers[0].date_day){ %> selected="true" <%}%>><%= i %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class='col-xs-3'>
+                                <select class="endDate-m">
+                                    <% for(let i = 1; i <= 12; i++){ %>
+                                        <option value='<%= i %>' <% if(i == customers[0].date_month){ %> selected="true" <%}%>><%= i %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class='col-xs-6'>
+                                <select class="endDate-y">
+                                    <% for(let i = currentDate.getFullYear() - 100; i <= currentDate.getFullYear(); i++){ %>
+                                        <option value='<%= i %>' <% if(i == customers[0].date_year){ %> selected="true" <%}%>><%= i %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <button class='submit-edit-customer sbutton'><span><i class="fas fa-save"></i></span>حفظ التعديلات</button>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(() => {
+    $('.submit-edit-customer').on('click', () => {
+        $.alert({
+            title: 'تأكيد',
+            icon: 'fas fa-question',
+            draggable: false,
+            rtl:true,
+            closeIcon: true,
+            type: 'orange',
+            content: 'هل أنت متأكد من حفظ التعديلات ؟',
+            buttons: {
+                ok: {
+                    text: 'نعم',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                        let customerBirthDate = $('.customerBirthDate'),
+                            customerName = $(".customerName").val(),
+                            customerId = $(".customerId").val(),
+                            customerBirthDateString = `${customerBirthDate.find('.endDate-y').val()}-${customerBirthDate.find('.endDate-m').val()}-${customerBirthDate.find('.endDate-d').val()}`;
+                        $.ajax({
+                            url: `/submit-edit-customers`,
+                            type: `POST`,
+                            data: {
+                                customerName,
+                                customerId,
+                                customerBirthDateString
+                            },
+                            success: () => {
+                                $.alert({
+                                    title: 'نجاح!',
+                                    icon: 'fas fa-check',
+                                    draggable: false,
+                                    rtl:true,
+                                    closeIcon: true,
+                                    type: 'green',
+                                    content: 'تم تعديل الزبائن بنجاح',
+                                    buttons: {
+                                        cancel: {
+                                            text: 'حسنا',
+                                            action: function () {
+                                                route('/customers');
+                                            }
+                                        }
+                                    }
+                                });
+                            },
+                            error: () => {
+                                $.alert({
+                                    title: 'أوبس!',
+                                    icon: 'fas fa-exclamation-triangle',
+                                    draggable: false,
+                                    rtl:true,
+                                    closeIcon: true,
+                                    type: 'red',
+                                    content: 'حدث خطأ أثناء تحديث الزبائن!',
+                                    buttons: {
+                                        cancel: {
+                                            text: 'حسنا',
+                                            action: function () {
+
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'لا',
+                    action: function () {
+
+                    }
+                }
+            }
+        });
+    });
+});
+</script>
+

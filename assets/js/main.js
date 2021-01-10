@@ -83,10 +83,13 @@ function styleTables(options, tableCount) {
 
     table.on('select deselect', function ( e, dt, type, indexes ) {
         let selectedRows = table.rows( { selected: true } ).count();
-        console.log(table.rows( { selected: true } ).data().length);
         if(selectedRows > 0){
+            if(selectedRows == 1){
+                table.button( 1 ).enable(true);
+            }else{
+                table.button( 1 ).enable(false);
+            }
             table.button( 0 ).enable(true);
-            table.button( 1 ).enable(true);
         }else{
             table.button( 0 ).enable(false);
             table.button( 1 ).enable(false);

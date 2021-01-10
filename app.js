@@ -5,6 +5,8 @@ const tendersRoute = require("./routes/tendersRoute");
 const employeesRoute = require("./routes/employeesRoute");
 const errorRoute = require("./routes/errorRoute");
 const categoriesRoute = require("./routes/categoriesRoute");
+const managerCustomersRoute = require("./routes/managerCustomersRoute");
+const salesRoute = require("./routes/salesRoute");
 const cookieParser = require('cookie-parser');
 const {reqAuth} = require('./middlewares/authMiddleware');
 
@@ -31,4 +33,6 @@ app.use(requestsRoute);
 app.use(tendersRoute);
 app.use(employeesRoute);
 app.use(categoriesRoute);
+app.use(managerCustomersRoute);
+app.use(salesRoute);
 app.use(errorRoute);

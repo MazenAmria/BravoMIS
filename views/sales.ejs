@@ -1,0 +1,302 @@
+<div class='all-wrapper'>
+
+    <div class="row">
+        <div class='add-discount-wrapper col-sm-6'>
+            <div class='widget'>
+                <div class='widget-title'>
+                    <h2>إضافة شرط <span>تنفيذ خصم</span></h2>
+                </div>
+                <form id='addDiscount'>
+                    <label for='discountPercentage'>(%) نسبة الخصم</label>
+                    <input type="text" name="discountPercentage" class='discountPercentage'>
+                    <label for='discountMinPrice'>أقل سعر لتنفيذ الخصم</label>
+                    <input type="text" name="discountMinPrice" class='discountMinPrice'>
+                    <label for='discountDateRange' class="discountDateRange">فترة التنفيذ</label>
+                    <div class='discountDate row clearfix'>
+                        <div class="col-xs-6">
+                            <div class="row-medium">
+                                <div>
+                                    <span class="clearfix col-xs-12">من</span>
+                                    <div class='col-xs-3'>
+                                        <select class="startDate-d">
+                                            <% for(let i = 1; i <= 31; i++){ %>
+                                                <option value='<%= i %>' <% if(i == currentDate.getDate()){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-3'>
+                                        <select class="startDate-m">
+                                            <% for(let i = 1; i <= 12; i++){ %>
+                                                <option value='<%= i %>' <% if(i == currentDate.getMonth() + 1){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-6'>
+                                        <select class="startDate-y">
+                                            <% for(let i = currentDate.getFullYear(); i <= currentDate.getFullYear() + 5; i++){ %>
+                                                <option value='<%= i %>'><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="row-medium">
+                                <div>
+                                    <span class="clearfix col-xs-12">إلى</span>
+                                    <div class='col-xs-3'>
+                                        <select class="endDate-d">
+                                            <% for(let i = 1; i <= 31; i++){ %>
+                                                <option value='<%= i %>' <% if(i == currentDate.getDate() + 1){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-3'>
+                                        <select class="endDate-m">
+                                            <% for(let i = 1; i <= 12; i++){ %>
+                                                <option value='<%= i %>'><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-6'>
+                                        <select class="endDate-y">
+                                            <% for(let i = currentDate.getFullYear(); i <= currentDate.getFullYear() + 10; i++){ %>
+                                                <option value='<%= i %>'><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class='main-background submit-discount mbutton'><span><i class="fas fa-plus"></i></span>إضافة الخصم</button>
+                </form>
+            </div>
+        </div>
+        <div class='discount-table-wrapper col-sm-12'>
+            <discount-table></discount-table>
+        </div>
+    </div>
+
+
+</div>
+<script type="text/javascript">
+$(document).ready(() => {
+
+    let showAllDiscounts =  (filter) => {
+        if(!filter) filter = {}
+        $.ajax({
+            url: '/discounts/api',
+            method: 'GET',
+            data: filter,
+            success: (data) => {
+                let ejsData = ejs.render(tableTemplate, {
+                    title: 'شروط الخصم',
+                    columns: [
+                        'معرف الشرط',
+                        'نسبة الخصم (%)',
+                        'السعر الأدنى للخصم',
+                        'تاريخ البداية',
+                        'تاريخ النهاية',
+                        'الحالة'
+                    ],
+                    tuples: data,
+                    tableCount: 1
+                });
+                $('discount-table').html(ejsData);
+                styleTables({
+                    onDelete: (e, buttonApi, dt, node, config) => {
+                        $.alert({
+                            title: 'تأكيد!',
+                            icon: 'fas fa-exclamation-triangle',
+                            draggable: false,
+                            rtl:true,
+                            closeIcon: true,
+                            type: 'red',
+                            content: 'هل أنت متأكد من رغبتك بحذف الشروط!',
+                            buttons: {
+                                yes: {
+                                    text: 'نعم',
+                                    btnClass: 'btn-red',
+                                    action: function () {
+                                        const rows = buttonApi.rows( { selected: true } ).nodes();
+                                        deleteDiscounts = [];
+                                        for(let i = 0; i < rows.length; i++){
+                                            for(let j = 0; j < rows[i].children.length; j++){
+                                                if(rows[i].children[j].attributes[0].nodeValue == 'discount_id'){
+                                                    deleteDiscounts.push(rows[i].children[j].innerText);
+                                                }
+                                            }
+                                        }
+                                        $.ajax({
+                                            url: `/discounts/delete`,
+                                            type: `DELETE`,
+                                            data: {deleteDiscounts},
+                                            success: (msg) => {
+                                                $.alert({
+                                                    title: 'نجاح!',
+                                                    icon: 'fas fa-check',
+                                                    draggable: false,
+                                                    rtl:true,
+                                                    closeIcon: true,
+                                                    type: 'green',
+                                                    content: 'تم حذف الموظفين بنجاح!',
+                                                    buttons: {
+                                                        cancel: {
+                                                            text: 'حسنا',
+                                                            action: function () {
+                                                                showAllDiscounts();
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            },
+                                            error: (err) => {
+                                                $.alert({
+                                                    title: 'فشل!',
+                                                    icon: 'fas fa-exclamation-triangle',
+                                                    draggable: false,
+                                                    rtl:true,
+                                                    closeIcon: true,
+                                                    type: 'orange',
+                                                    content: 'حدث خطأ أثناء حذف الشروط, الرجاء المحاولة مرة أخرى!',
+                                                    buttons: {
+                                                        cancel: {
+                                                            text: 'حسنا',
+                                                            action: function () {
+
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                },
+                                no: {
+                                    text: 'لا',
+                                    action: function () {
+
+                                    }
+                                }
+                            }
+                        });
+                    },
+                    onEdit: (e, buttonApi, dt, node, config) => {   
+                        const rows = buttonApi.rows( { selected: true } ).nodes();
+                        editRoute = `discounts/edit/`;
+                        for(let j = 0; j < rows[0].children.length; j++){
+                            if(rows[0].children[j].attributes[0].nodeValue == 'discount_id'){
+                                editRoute += rows[0].children[j].innerText;
+                            }
+                        }
+                        route(editRoute);
+                    }
+                }, 1);
+            }
+        });
+    }
+    showAllDiscounts();
+
+    $(".submit-discount").on("click", (e) => {
+        e.preventDefault();
+        let discountPercentage = $('.discountPercentage').val(),
+        discountMinPrice = $('.discountMinPrice').val(),
+        start_date = `${$('.discountDate .startDate-y').val()}-${$('.discountDate .startDate-m').val()}-${$('.discountDate .startDate-d').val()}`,
+        end_date = `${$('.discountDate .endDate-y').val()}-${$('.discountDate .endDate-m').val()}-${$('.discountDate .endDate-d').val()}`,
+        start_date_object = new Date(start_date);
+        end_date_object = new Date(end_date);
+        if(end_date_object <= start_date_object){
+            $.alert({
+                title: 'فشل!',
+                icon: 'fas fa-exclamation-triangle',
+                draggable: false,
+                rtl:true,
+                closeIcon: true,
+                type: 'orange',
+                content: 'يجب أن يكون تاريخ الإنتهاء أكبر من تاريخ البدء!',
+                buttons: {
+                    cancel: {
+                        text: 'إغلاق',
+                        action: function () {
+
+                        }
+                    }
+                }
+            });
+        }else{
+            if(discountPercentage.length > 0 && discountMinPrice.length > 0){
+                $.ajax({
+                    url: `/submit-discount`,
+                    type: `POST`,
+                    data: {discountPercentage, discountMinPrice, start_date, end_date},
+                    success: (status) => {
+                        showAllDiscounts();
+                        $.alert({
+                            title: 'نجاح!',
+                            icon: 'fas fa-check',
+                            draggable: false,
+                            rtl:true,
+                            closeIcon: true,
+                            type: 'green',
+                            content: 'تمت إضافة الشرط بنجاح',
+                            buttons: {
+                                cancel: {
+                                    text: 'حسنا',
+                                    action: function () {
+
+                                    }
+                                }
+                            }
+                        });
+                    },
+                    error: (err) => {
+                        console.log(err);
+                        if(err.status == 409){
+                        }else if(err.status == 422){
+                            $.alert({
+                                title: 'أوبس!',
+                                icon: 'fas fa-exclamation-triangle',
+                                draggable: false,
+                                rtl:true,
+                                closeIcon: true,
+                                type: 'red',
+                                content: 'التاريخ الذي أدخلته خاطئ!',
+                                buttons: {
+                                    cancel: {
+                                        text: 'حسنا',
+                                        action: function () {
+
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }else{
+                $.alert({
+                    title: 'فشل!',
+                    icon: 'fas fa-exclamation-triangle',
+                    draggable: false,
+                    rtl:true,
+                    closeIcon: true,
+                    type: 'orange',
+                    content: 'يبدو أنك تركت أحد المدخلات فارغًا!',
+                    buttons: {
+                        cancel: {
+                            text: 'إغلاق',
+                            action: function () {
+
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+
+});
+</script>

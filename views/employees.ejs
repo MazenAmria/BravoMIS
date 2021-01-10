@@ -163,7 +163,7 @@ $(document).ready(() => {
                                             }
                                         }
                                         $.ajax({
-                                            url: `employees/delete`,
+                                            url: `/employees/delete`,
                                             type: `DELETE`,
                                             data: {deleteEmployees},
                                             success: (msg) => {
@@ -218,15 +218,11 @@ $(document).ready(() => {
                     },
                     onEdit: (e, buttonApi, dt, node, config) => {   
                         const rows = buttonApi.rows( { selected: true } ).nodes();
-                        editRoute = "employees/edit/?";
-                        for(let i = 0; i < rows.length; i++){
-                            for(let j = 0; j < rows[i].children.length; j++){
-                                if(rows[i].children[j].attributes[0].nodeValue == 'emp_id'){
-                                    editRoute += `${i}=${rows[i].children[j].innerText}`;
-                                }
+                        editRoute = "employees/edit/";
+                        for(let j = 0; j < rows[0].children.length; j++){
+                            if(rows[0].children[j].attributes[0].nodeValue == 'emp_id'){
+                                editRoute += rows[0].children[j].innerText;
                             }
-                            if(i != rows.length - 1)
-                                editRoute += `&`;
                         }
                         route(editRoute);
                     }
@@ -263,11 +259,13 @@ $(document).ready(() => {
             employeePassword = $('.employeePassword').val(),
             employeeRole = ($('.employeeRole').select2('data')[0]).id;
         if(employeeName.length > 0 && employeeUsername.length > 0 && employeePassword.length > 0 && employeeRole.length > 0){
+            
             $.ajax({
                 url: `/submit-employee`,
                 type: `POST`,
                 data: {employeeName, employeeUsername, employeePassword, employeeRole},
                 success: (status) => {
+                    showAllEmployees();
                     $.alert({
                         title: 'نجاح!',
                         icon: 'fas fa-check',

@@ -3,20 +3,18 @@
         <div class='widget-title'>
             <h2>تعديل <span>الموظفين</span></h2>
         </div>
-        <% for(employee in employees){ %>
-            <form id='editEmployee<%= employee %>' class='editEmployee'>
-                <label for='employeeName'>إسم الموظف</label>
-                <input type="text" name="employeeName" class='employeeName' value='<%= employees[employee].emp_name %>' required>
-                <label for='employeeUsername'>اسم المستخدم</label>
-                <input type="text" name="employeeUsername" disabled class='employeeUsername' value='<%= employees[employee].emp_id %>' required>
-                <label for='employeeStatus'>الحالة</label>
-                <select name="employeeStatus" class="employeeStatus">
-                    <option value="يعمل" <% if(employees[employee].emp_status == 'يعمل'){ %> selected="true" <% } %>>يعمل</option>
-                    <option value="متقاعد" <% if(employees[employee].emp_status == 'متقاعد'){ %> selected="true" <% } %>>متقاعد</option>
-                    <option value="مفصول" <% if(employees[employee].emp_status == 'مفصول'){ %> selected="true" <% } %>>مفصول</option>
-                </select>
-            </form>
-        <% } %>
+        <form id='editEmployee' class='editEmployee'>
+            <label for='employeeName'>إسم الموظف</label>
+            <input type="text" name="employeeName" class='employeeName' value='<%= employees[0].emp_name %>' required>
+            <label for='employeeUsername'>اسم المستخدم</label>
+            <input type="text" name="employeeUsername" disabled class='employeeUsername' value='<%= employees[0].emp_id %>' required>
+            <label for='employeeStatus'>الحالة</label>
+            <select name="employeeStatus" class="employeeStatus">
+                <option value="يعمل" <% if(employees[0].emp_status == 'يعمل'){ %> selected="true" <% } %>>يعمل</option>
+                <option value="متقاعد" <% if(employees[0].emp_status == 'متقاعد'){ %> selected="true" <% } %>>متقاعد</option>
+                <option value="مفصول" <% if(employees[0].emp_status == 'مفصول'){ %> selected="true" <% } %>>مفصول</option>
+            </select>
+        </form>
         <button class='submit-edit-employee sbutton'><span><i class="fas fa-save"></i></span>حفظ التعديلات</button>
     </div>
 </div>
@@ -37,17 +35,17 @@ $(document).ready(() => {
                     text: 'نعم',
                     btnClass: 'btn-blue',
                     action: function () {
-                        let employeesToEdit = [];
-                        $.each($(".editEmployee"), (index, record) => {
-                            let employeeName = $(record).find(".employeeName").val(),
-                                employeeUsername = $(record).find(".employeeUsername").val(),
-                                employeeStatus = ($(record).find('.employeeStatus').select2('data')[0]).text;
-                            employeesToEdit.push({employeeName, employeeUsername, employeeStatus});
-                        });
+                        let employeeName = $(".employeeName").val(),
+                            employeeUsername = $(".employeeUsername").val(),
+                            employeeStatus = ($('.employeeStatus').select2('data')[0]).text;
                         $.ajax({
                             url: `/submit-edit-employees`,
                             type: `POST`,
-                            data: {employeesToEdit},
+                            data: {
+                                employeeName,
+                                employeeUsername,
+                                employeeStatus
+                            },
                             success: () => {
                                 $.alert({
                                     title: 'نجاح!',

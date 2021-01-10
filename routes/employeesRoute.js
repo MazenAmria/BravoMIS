@@ -74,15 +74,14 @@ router.get('/employees/api', (req, res) => {
 });
 
 // Route to get all employees requested to edit
-router.get('/employees/edit', (req, res) => {
+router.get('/employees/edit/:id', (req, res) => {
     let role = res.locals.role.toLowerCase();
     if (res.statusCode === 440) {
         res.redirect('/login');
     } else {
         if(role == 'manager'){
-            let employeesToEdit = Object.values(req.query);
-            let usersArray = `('` + employeesToEdit.join(`','`) + `')`;
-            db.query(`SELECT E.emp_id, E.emp_name, E.emp_role, E.emp_status FROM employee E WHERE E.emp_id IN ${usersArray}`, (err, results) => {
+            const employeeId = req.params.id;
+            db.query(`SELECT E.emp_id, E.emp_name, E.emp_role, E.emp_status FROM employee E WHERE E.emp_id = '${employeeId}'`, (err, results) => {
                 if(err){
                     console.log(err);
                 }else{
@@ -135,22 +134,17 @@ router.post('/submit-edit-employees', reqAuth, (req, res) => {
         res.redirect('/login');
     } else {
         if(role == 'manager'){
-            const employeesToEdit = req.body.employeesToEdit; 
-            try{
-                for(key in employeesToEdit){
-                    const employeeName = employeesToEdit[key].employeeName,
-                        employeeUsername = employeesToEdit[key].employeeUsername,
-                        employeeStatus = employeesToEdit[key].employeeStatus;
-                    db.query(`UPDATE employee E SET E.emp_name = '${employeeName}', E.emp_status = '${employeeStatus}' WHERE E.emp_id = '${employeeUsername}'`, (err) => {
-                        if(err){
-                            res.status(409).send("Failed");
-                        }
-                    });
+            const employeeName = req.body.employeeName,
+                employeeUsername = req.body.employeeUsername,
+                employeeStatus = req.body.employeeStatus;
+            db.query(`UPDATE employee E SET E.emp_name = '${employeeName}', E.emp_status = '${employeeStatus}' WHERE E.emp_id = '${employeeUsername}'`, (err) => {
+                if(err){
+                    res.status(409).send("Failed");
+                }else{
+                    res.status(200).send("Success");
                 }
-                res.status(200).send("Success");
-            }catch(err){
-                res.status(409).send("Failed");
-            }
+            });
+                
         }
     }
 });

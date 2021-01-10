@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS employee (
     emp_password VARCHAR(200) NOT NULL,	                    -- encrypted password
     emp_name VARCHAR(50),				                    -- real name
     emp_role VARCHAR(50) NOT NULL DEFAULT 'Unauthorized',   -- [Manager|Vending Manager|Cashier|Guest|Unauthorized]
-    emp_status VARCHAR(50),                                 -- [مفصول|متقاعد|يعمل]
     emp_registration_date DATE,
+    emp_status VARCHAR(50),                                 -- [مفصول|متقاعد|يعمل]
     PRIMARY KEY (emp_id)
 );
 
@@ -21,26 +21,29 @@ CREATE TABLE IF NOT EXISTS customer (
 	customer_id VARCHAR(50),
     customer_name VARCHAR(50),
     date_of_birth DATE,
-    points INTEGER,
     PRIMARY KEY (customer_id)
-);
-
-CREATE TABLE IF NOT EXISTS class_points (
-    class VARCHAR(50),
-    min_points INTEGER,
-    max_points INTEGER,
-    PRIMARY KEY (class)
 );
 
 CREATE TABLE IF NOT EXISTS invoice (
 	invoice_id INTEGER AUTO_INCREMENT,
-    total_price VARCHAR(50),
+    total_price DECIMAL(10,2),
     invoice_time DATETIME,
     customer_id VARCHAR(50),
     cashier_id VARCHAR(50),
+    discount_id INTEGER,
     PRIMARY KEY (invoice_id),
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
-    FOREIGN KEY (cashier_id) REFERENCES employee(emp_id)
+    FOREIGN KEY (cashier_id) REFERENCES employee(emp_id),
+    FOREIGN KEY (discount_id) REFERENCES invoice_discount(discount_id)
+);
+CREATE TABLE IF NOT EXISTS invoice_discount(
+    discount_id INTEGER AUTO_INCREMENT,
+    discount_percentage INTEGER NOT NULL,
+    total_price DECIMAL(10,2),
+    min_date DATE,
+    max_date DATE,
+    discount_status VARCHAR(50) DEFAULT 'فعال',
+    PRIMARY KEY (discount_id)
 );
 
 -- BY: SARA SHAABNA
