@@ -1,0 +1,219 @@
+<div class='all-wrapper'>
+    <div class='widget'>
+        <div class='widget-title'>
+            <h2>تعديل شروط الخصم على المنتجات</h2>
+        </div>
+        <form id='editDiscount' class='editDiscount'>
+            <label for='discountId'>معرف الخصم</label>
+            <input type="text" name="discountId" value='<%= discounts[0].discount_id %>' class='discountId' disabled required>
+            <label for='discountItem'>المنتج</label>
+            <select name="discountItem" class="discountItem">
+                <% for(key in items){ %>
+                <option value='<%= items[key].item_id %>' <% if(discounts[0].item_id == items[key].item_id){ %> selected="true" <% } %>>
+                        <%= items[key].item_name %>
+                    </option>
+                <% } %>
+            </select>
+            <label for='discountPercentage'>(%) نسبة الخصم</label>
+            <input type="text" name="discountPercentage" value='<%= discounts[0].discount_percentage %>' class='discountPercentage' required>
+            <label for='discountMinQuantity'>أقل كمية لتنفيذ الخصم</label>
+            <input type="text" name="discountMinQuantity" value='<%= discounts[0].minimum_quantity %>' class='discountMinQuantity' required>
+            <label for='discountDateRange'>فترة تنفيذ الخصم</label>
+            <div class='discountDate row clearfix'>
+                <div class="col-xs-6">
+                    <div class="row-medium">
+                        <div>
+                            <span class="clearfix col-xs-12">من</span>
+                            <div class='col-xs-3'>
+                                <select class="startDate-d">
+                                    <% for(let i = 1; i <= 31; i++){ %>
+                                        <option value='<%= i %>' <% if(i == discounts[0].min_day){ %> selected="true" <% } %>><%= i %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class='col-xs-3'>
+                                <select class="startDate-m">
+                                    <% for(let i = 1; i <= 12; i++){ %>
+                                        <option value='<%= i %>' <% if(i == discounts[0].min_month){ %> selected="true" <% } %>><%= i %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class='col-xs-6'>
+                                <select class="startDate-y">
+                                    <% for(let i = discounts[0].min_year; i <= currentDate.getFullYear() + 5; i++){ %>
+                                        <option value='<%= i %>' <% if(i == discounts[0].min_year){ %> selected="true" <% } %>><%= i %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="row-medium">
+                        <div>
+                            <span class="clearfix col-xs-12">إلى</span>
+                            <div class='col-xs-3'>
+                                <select class="endDate-d">
+                                    <% for(let i = 1; i <= 31; i++){ %>
+                                        <option value='<%= i %>' <% if(i == discounts[0].max_day){ %> selected="true" <% } %>><%= i %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class='col-xs-3'>
+                                <select class="endDate-m">
+                                    <% for(let i = 1; i <= 12; i++){ %>
+                                        <option value='<%= i %>' <% if(i == discounts[0].max_month){ %> selected="true" <% } %>><%= i %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class='col-xs-6'>
+                                <select class="endDate-y">
+                                    <% for(let i = discounts[0].max_year; i <= currentDate.getFullYear() + 10; i++){ %>
+                                        <option value='<%= i %>' <% if(i == discounts[0].max_year){ %> selected="true" <% } %>><%= i %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <label for='discountStatus'>الحالة</label>
+            <select class='discountStatus' name='discountStatus'>
+                <option value='فعال' <% if(discounts[0].discount_status == 'فعال'){ %> selected="true"<% } %>>فعال</option>
+                <option value='متوقف' <% if(discounts[0].discount_status == 'متوقف'){ %> selected="true"<% } %>>متوقف</option>
+            </select>
+        </form>
+        <button class='submit-edit-discount sbutton'><span><i class="fas fa-save"></i></span>حفظ التعديلات</button>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(() => {
+    $(".discountItem").select2();
+    $('.submit-edit-discount').on('click', () => {
+        $.alert({
+            title: 'تأكيد',
+            icon: 'fas fa-question',
+            draggable: false,
+            rtl:true,
+            closeIcon: true,
+            type: 'orange',
+            content: 'هل أنت متأكد من حفظ التعديلات ؟',
+            buttons: {
+                ok: {
+                    text: 'نعم',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                        let discountItem = $(".discountItem").select2('data')[0].element.value,
+                            discountId = $('.discountId').val(),
+                            discountPercentage = $('.discountPercentage').val(),
+                            discountMinQuantity = $('.discountMinQuantity').val(),
+                            start_date = `${$('.discountDate .startDate-y').val()}-${$('.discountDate .startDate-m').val()}-${$('.discountDate .startDate-d').val()}`,
+                            end_date = `${$('.discountDate .endDate-y').val()}-${$('.discountDate .endDate-m').val()}-${$('.discountDate .endDate-d').val()}`,
+                            discountStatus = $('.discountStatus').val(),
+                            start_date_object = new Date(start_date);
+                            end_date_object = new Date(end_date);
+                        if(end_date_object <= start_date_object){
+                            $.alert({
+                                title: 'فشل!',
+                                icon: 'fas fa-exclamation-triangle',
+                                draggable: false,
+                                rtl:true,
+                                closeIcon: true,
+                                type: 'orange',
+                                content: 'يجب أن يكون تاريخ الإنتهاء أكبر من تاريخ البدء!',
+                                buttons: {
+                                    cancel: {
+                                        text: 'إغلاق',
+                                        action: function () {
+
+                                        }
+                                    }
+                                }
+                            });
+                        }else{
+                            $.ajax({
+                                url: `/submit-edit-item-discounts`,
+                                type: `POST`,
+                                data: {
+                                    discountItem,
+                                    discountId,
+                                    discountPercentage,
+                                    discountMinQuantity,
+                                    start_date,
+                                    end_date,
+                                    discountStatus
+                                },
+                                success: () => {
+                                    $.alert({
+                                        title: 'نجاح!',
+                                        icon: 'fas fa-check',
+                                        draggable: false,
+                                        rtl:true,
+                                        closeIcon: true,
+                                        type: 'green',
+                                        content: 'تم تعديل الشرط بنجاح',
+                                        buttons: {
+                                            cancel: {
+                                                text: 'حسنا',
+                                                action: function () {
+                                                    route('/sales');
+                                                }
+                                            }
+                                        }
+                                    });
+                                },
+                                error: (err) => {
+                                    if(err.status == 422){
+                                        $.alert({
+                                            title: 'أوبس!',
+                                            icon: 'fas fa-exclamation-triangle',
+                                            draggable: false,
+                                            rtl:true,
+                                            closeIcon: true,
+                                            type: 'red',
+                                            content: 'التاريخ الذي أدخلته خاطئ!',
+                                            buttons: {
+                                                cancel: {
+                                                    text: 'حسنا',
+                                                    action: function () {
+
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    }else{
+                                        $.alert({
+                                            title: 'أوبس!',
+                                            icon: 'fas fa-exclamation-triangle',
+                                            draggable: false,
+                                            rtl:true,
+                                            closeIcon: true,
+                                            type: 'red',
+                                            content: 'حدث خطأ أثناء تحديث الشرط!',
+                                            buttons: {
+                                                cancel: {
+                                                    text: 'حسنا',
+                                                    action: function () {
+
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                },
+                cancel: {
+                    text: 'لا',
+                    action: function () {
+
+                    }
+                }
+            }
+        });
+    });
+});
+</script>
+

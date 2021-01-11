@@ -4,7 +4,7 @@
         <div class='add-discount-wrapper col-sm-6'>
             <div class='widget'>
                 <div class='widget-title'>
-                    <h2>إضافة شرط <span>تنفيذ خصم</span></h2>
+                    <h2>إضافة شرط تنفيذ <span>خصم على الفاتورة</span></h2>
                 </div>
                 <form id='addDiscount'>
                     <label for='discountPercentage'>(%) نسبة الخصم</label>
@@ -74,8 +74,93 @@
                 </form>
             </div>
         </div>
+        <div class='add-discount-item col-sm-6'>
+            <div class='widget'>
+                <div class='widget-title'>
+                    <h2>إضافة شرط تنفيذ <span>خصم على المنتجات</span></h2>
+                </div>
+                <form id='addDiscount'>
+                    <label for='discountItem'>المنتج</label>
+                    <select name="discountItem" class="discountItem">
+                        <option value='nothing'>لا شيء</option>
+                        <% for(key in items){ %>
+                            <option value='<%= items[key].item_id %>'>
+                                <%= items[key].item_name %>
+                            </option>
+                        <% } %>
+                    </select>
+                    <label for='discountPercentageItem'>(%) نسبة الخصم</label>
+                    <input type="text" name="discountPercentageItem" class='discountPercentageItem'>
+                    <label for='discountMinQuantity'>أقل كمية لتنفيذ الخصم</label>
+                    <input type="text" name="discountMinQuantity" class='discountMinQuantity'>
+                    <label for='discountDateRangeItem' class="discountDateRangeItem">فترة التنفيذ</label>
+                    <div class='discountDateItem row clearfix'>
+                        <div class="col-xs-6">
+                            <div class="row-medium">
+                                <div>
+                                    <span class="clearfix col-xs-12">من</span>
+                                    <div class='col-xs-3'>
+                                        <select class="startDate-d">
+                                            <% for(let i = 1; i <= 31; i++){ %>
+                                                <option value='<%= i %>' <% if(i == currentDate.getDate()){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-3'>
+                                        <select class="startDate-m">
+                                            <% for(let i = 1; i <= 12; i++){ %>
+                                                <option value='<%= i %>' <% if(i == currentDate.getMonth() + 1){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-6'>
+                                        <select class="startDate-y">
+                                            <% for(let i = currentDate.getFullYear(); i <= currentDate.getFullYear() + 5; i++){ %>
+                                                <option value='<%= i %>'><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="row-medium">
+                                <div>
+                                    <span class="clearfix col-xs-12">إلى</span>
+                                    <div class='col-xs-3'>
+                                        <select class="endDate-d">
+                                            <% for(let i = 1; i <= 31; i++){ %>
+                                                <option value='<%= i %>' <% if(i == currentDate.getDate() + 1){ %> selected="true" <% } %>><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-3'>
+                                        <select class="endDate-m">
+                                            <% for(let i = 1; i <= 12; i++){ %>
+                                                <option value='<%= i %>'><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class='col-xs-6'>
+                                        <select class="endDate-y">
+                                            <% for(let i = currentDate.getFullYear(); i <= currentDate.getFullYear() + 10; i++){ %>
+                                                <option value='<%= i %>'><%= i %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class='main-background submit-discount-item mbutton'><span><i class="fas fa-plus"></i></span>إضافة الخصم</button>
+                </form>
+            </div>
+        </div>
         <div class='discount-table-wrapper col-sm-12'>
             <discount-table></discount-table>
+        </div>
+        <div class='discount-item-table-wrapper col-sm-12'>
+            <discount-item-table></discount-item-table>
         </div>
     </div>
 
@@ -83,6 +168,8 @@
 </div>
 <script type="text/javascript">
 $(document).ready(() => {
+
+    $(".discountItem").select2();
 
     let showAllDiscounts =  (filter) => {
         if(!filter) filter = {}
@@ -92,7 +179,7 @@ $(document).ready(() => {
             data: filter,
             success: (data) => {
                 let ejsData = ejs.render(tableTemplate, {
-                    title: 'شروط الخصم',
+                    title: 'شروط الخصم على الفاتورة',
                     columns: [
                         'معرف الشرط',
                         'نسبة الخصم (%)',
@@ -141,7 +228,7 @@ $(document).ready(() => {
                                                     rtl:true,
                                                     closeIcon: true,
                                                     type: 'green',
-                                                    content: 'تم حذف الموظفين بنجاح!',
+                                                    content: 'تم حذف الشروط بنجاح!',
                                                     buttons: {
                                                         cancel: {
                                                             text: 'حسنا',
@@ -198,7 +285,121 @@ $(document).ready(() => {
         });
     }
     showAllDiscounts();
+    let showAllDiscountsItem =  (filter) => {
+        if(!filter) filter = {}
+        $.ajax({
+            url: '/discounts-item/api',
+            method: 'GET',
+            data: filter,
+            success: (data) => {
+                let ejsData = ejs.render(tableTemplate, {
+                    title: 'شروط الخصم على المنتجات',
+                    columns: [
+                        'معرف الشرط',
+                        'نسبة الخصم (%)',
+                        'المنتج',
+                        'أقل كمية لتنفيذ الخصم',
+                        'تاريخ البداية',
+                        'تاريخ النهاية',
+                        'الحالة'
+                    ],
+                    tuples: data,
+                    tableCount: 0
+                });
+                $('discount-item-table').html(ejsData);
+                styleTables({
+                    onDelete: (e, buttonApi, dt, node, config) => {
+                        $.alert({
+                            title: 'تأكيد!',
+                            icon: 'fas fa-exclamation-triangle',
+                            draggable: false,
+                            rtl:true,
+                            closeIcon: true,
+                            type: 'red',
+                            content: 'هل أنت متأكد من رغبتك بحذف الشروط!',
+                            buttons: {
+                                yes: {
+                                    text: 'نعم',
+                                    btnClass: 'btn-red',
+                                    action: function () {
+                                        const rows = buttonApi.rows( { selected: true } ).nodes();
+                                        deleteDiscounts = [];
+                                        for(let i = 0; i < rows.length; i++){
+                                            for(let j = 0; j < rows[i].children.length; j++){
+                                                if(rows[i].children[j].attributes[0].nodeValue == 'discount_id'){
+                                                    deleteDiscounts.push(rows[i].children[j].innerText);
+                                                }
+                                            }
+                                        }
+                                        $.ajax({
+                                            url: `/discounts-item/delete`,
+                                            type: `DELETE`,
+                                            data: {deleteDiscounts},
+                                            success: (msg) => {
+                                                $.alert({
+                                                    title: 'نجاح!',
+                                                    icon: 'fas fa-check',
+                                                    draggable: false,
+                                                    rtl:true,
+                                                    closeIcon: true,
+                                                    type: 'green',
+                                                    content: 'تم حذف الشروط بنجاح!',
+                                                    buttons: {
+                                                        cancel: {
+                                                            text: 'حسنا',
+                                                            action: function () {
+                                                                showAllDiscountsItem();
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            },
+                                            error: (err) => {
+                                                $.alert({
+                                                    title: 'فشل!',
+                                                    icon: 'fas fa-exclamation-triangle',
+                                                    draggable: false,
+                                                    rtl:true,
+                                                    closeIcon: true,
+                                                    type: 'orange',
+                                                    content: 'حدث خطأ أثناء حذف الشروط, الرجاء المحاولة مرة أخرى!',
+                                                    buttons: {
+                                                        cancel: {
+                                                            text: 'حسنا',
+                                                            action: function () {
 
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                },
+                                no: {
+                                    text: 'لا',
+                                    action: function () {
+
+                                    }
+                                }
+                            }
+                        });
+                    },
+                    onEdit: (e, buttonApi, dt, node, config) => {   
+                        const rows = buttonApi.rows( { selected: true } ).nodes();
+                        editRoute = `discounts-item/edit/`;
+                        for(let j = 0; j < rows[0].children.length; j++){
+                            if(rows[0].children[j].attributes[0].nodeValue == 'discount_id'){
+                                editRoute += rows[0].children[j].innerText;
+                            }
+                        }
+                        route(editRoute);
+                    }
+                }, 0);
+            }
+        });
+    }
+    showAllDiscountsItem();
     $(".submit-discount").on("click", (e) => {
         e.preventDefault();
         let discountPercentage = $('.discountPercentage').val(),
@@ -297,6 +498,110 @@ $(document).ready(() => {
         }
     });
 
+    $(".submit-discount-item").on("click", (e) => {
+        e.preventDefault();
+        let discountItem = $(".discountItem").select2('data')[0].element.value,
+            discountPercentageItem = $('.discountPercentageItem').val(),
+            discountMinQuantity = $('.discountMinQuantity').val(),
+            start_date = `${$('.discountDateItem .startDate-y').val()}-${$('.discountDateItem .startDate-m').val()}-${$('.discountDateItem .startDate-d').val()}`,
+            end_date = `${$('.discountDateItem .endDate-y').val()}-${$('.discountDateItem .endDate-m').val()}-${$('.discountDateItem .endDate-d').val()}`,
+            start_date_object = new Date(start_date);
+            end_date_object = new Date(end_date);
+        if(end_date_object <= start_date_object){
+            $.alert({
+                title: 'فشل!',
+                icon: 'fas fa-exclamation-triangle',
+                draggable: false,
+                rtl:true,
+                closeIcon: true,
+                type: 'orange',
+                content: 'يجب أن يكون تاريخ الإنتهاء أكبر من تاريخ البدء!',
+                buttons: {
+                    cancel: {
+                        text: 'إغلاق',
+                        action: function () {
+
+                        }
+                    }
+                }
+            });
+        }else{
+            if(discountItem != 'nothing' && discountPercentageItem.length > 0 && discountMinQuantity.length > 0){
+                $.ajax({
+                    url: `/submit-discount-item`,
+                    type: `POST`,
+                    data: {
+                        discountItem,
+                        discountPercentageItem,
+                        discountMinQuantity,
+                        start_date,
+                        end_date
+                    },
+                    success: (status) => {
+                        showAllDiscountsItem();
+                        $.alert({
+                            title: 'نجاح!',
+                            icon: 'fas fa-check',
+                            draggable: false,
+                            rtl:true,
+                            closeIcon: true,
+                            type: 'green',
+                            content: 'تمت إضافة الشرط بنجاح',
+                            buttons: {
+                                cancel: {
+                                    text: 'حسنا',
+                                    action: function () {
+
+                                    }
+                                }
+                            }
+                        });
+                    },
+                    error: (err) => {
+                        console.log(err);
+                        if(err.status == 409){
+                        }else if(err.status == 422){
+                            $.alert({
+                                title: 'أوبس!',
+                                icon: 'fas fa-exclamation-triangle',
+                                draggable: false,
+                                rtl:true,
+                                closeIcon: true,
+                                type: 'red',
+                                content: 'التاريخ الذي أدخلته خاطئ!',
+                                buttons: {
+                                    cancel: {
+                                        text: 'حسنا',
+                                        action: function () {
+
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }else{
+                $.alert({
+                    title: 'فشل!',
+                    icon: 'fas fa-exclamation-triangle',
+                    draggable: false,
+                    rtl:true,
+                    closeIcon: true,
+                    type: 'orange',
+                    content: 'يبدو أنك تركت أحد المدخلات فارغًا!',
+                    buttons: {
+                        cancel: {
+                            text: 'إغلاق',
+                            action: function () {
+
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
 
 });
 </script>

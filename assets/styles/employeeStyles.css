@@ -87,13 +87,19 @@ button.btn-red {
 .regDateLabel {
     margin-top: 15px;
 }
-.discountDate select {
+.discountDate select, .discountDateItem select {
     padding-right: 3px;
     padding-left: 0;
 }
-.customer-table-wrapper, .discount-table-wrapper {
+.customer-table-wrapper, .discount-table-wrapper, .discount-item-table-wrapper {
     margin-top: 30px;
 }
 .editDiscounts .discountDate {
+    margin-bottom: 15px;
+}
+#addDiscount .select2, .editDiscount .select2 {
+    margin-bottom: 15px;
+}
+.editDiscount .discountDate {
     margin-bottom: 15px;
 }

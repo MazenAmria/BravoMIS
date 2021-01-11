@@ -45,6 +45,17 @@ CREATE TABLE IF NOT EXISTS invoice_discount(
     discount_status VARCHAR(50) DEFAULT 'فعال',
     PRIMARY KEY (discount_id)
 );
+CREATE TABLE IF NOT EXISTS item_discount(
+    discount_id INTEGER AUTO_INCREMENT,
+    discount_percentage INTEGER NOT NULL,
+    item_id VARCHAR(200),
+    minimum_quantity INTEGER,
+    min_date DATE,
+    max_date DATE,
+    discount_status VARCHAR(50) DEFAULT 'فعال',
+    PRIMARY KEY (discount_id),
+    FOREIGN KEY (item_id) REFERENCES item(item_id)
+);
 
 -- BY: SARA SHAABNA
 CREATE TABLE IF NOT EXISTS category (
