@@ -32,7 +32,6 @@ $(document).ready(function(){
             url: 'DatatablesArabic.json'
         }
     });
-
 });
 
 function route(path) {
@@ -129,6 +128,21 @@ const errTemplate = `<div class="widget">
 
 const popUpTemplate = `<div class="pop-up widget">
     ${tableTemplate}
+</div>`;
+
+const tenderFormTemplate = `<div class="widget">
+    <div class="widget-title">
+        <h2>مناقصة <span>جديدة</span></h2>
+    </div>
+    <form>
+        <div class="row">
+            <label for="requestId" class="col-xs-4">رقم الطلب</label>
+            <input type="text" class="col-xs-8">
+        </div>
+        <input type="text">
+        <input type="text">
+        <input type="text">
+    </form>
 </div>`;
 
 function hidePopUp() {

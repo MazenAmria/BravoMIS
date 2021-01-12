@@ -4,7 +4,7 @@
             <% for (const tab of tabs) { %>
                 <li class="h-nav-item"
                     onclick="
-                            showTenders('/<%= tab.path %>', '<%= tab.method %>');
+                            showTenders('/<%= tab.path %>');
                             [...$('.h-nav-item')].forEach(item => item.classList.remove('active'));
                             event.currentTarget.classList.add('active');
                             "><%= tab.title %></li>
@@ -17,12 +17,13 @@
 </div>
 <script type="text/javascript">
     $(document).ready(() => {
-        $('.h-nav-item')[0].click();
+        [...$('.h-nav-item')][0].click();
     });
+
     function popUp(path) {
         event.preventDefault();
         $.ajax({
-            url: '/api/tenders/open/t.mazenamria',
+            url: path,
             method: 'GET',
             success: (data) => {
                 let ejsData = ejs.render(popUpTemplate, {
@@ -40,6 +41,7 @@
             }
         });
     }
+
     function renderLinks() {
         [...$('td')].filter(item => item.getAttribute('field') === 'offers').forEach((item) => {
             let path = `/${item.innerHTML}`;
@@ -51,27 +53,34 @@
             `;
         });
     }
-    function showTenders(path, method) {
-        event.preventDefault();
-        $.ajax({
-            url: path,
-            method: method,
-            data: {},
-            success: (data) => {
-                let ejsData = ejs.render(tableTemplate, {
-                    title: 'المناقصات',
-                    tableCount: 0,
-                    columns: data.columns,
-                    tuples: data.tuples
-                });
-                $('tenders-template').html(ejsData);
-                styleTables({}, 0);
-                renderLinks();
-            },
-            error: (xhr, ajaxOptions, thrownError) => {
-                let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});
-                $('tenders-template').html(ejsData);
-            }
-        });
+
+    function showTenders(path) {
+        if (path === `/api/tenders/new`) {
+            event.preventDefault();
+            let ejsData = ejs.render(tenderFormTemplate);
+            $('tenders-template').html(ejsData);
+        } else {
+            event.preventDefault();
+            $.ajax({
+                url: path,
+                method: 'GET',
+                data: {},
+                success: (data) => {
+                    let ejsData = ejs.render(tableTemplate, {
+                        title: 'المناقصات',
+                        tableCount: 0,
+                        columns: data.columns,
+                        tuples: data.tuples
+                    });
+                    $('tenders-template').html(ejsData);
+                    styleTables({}, 0);
+                    renderLinks();
+                },
+                error: (xhr, ajaxOptions, thrownError) => {
+                    let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});
+                    $('tenders-template').html(ejsData);
+                }
+            });
+        }
     }
 </script>

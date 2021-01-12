@@ -14,10 +14,10 @@ router.get('/tenders', (req, res) => {
             name: res.locals.name,
             role: res.locals.role,
             tabs: [
-                {title: 'المناقصات الجارية', path: `api/tenders/open/${res.locals.username}`, method: 'GET'},
-                {title: 'المناقصات المغلقة', path: `api/tenders/closed/${res.locals.username}`, method: 'GET'},
-                {title: 'أرشيف المناقصات', path: `api/tenders/resolved`, method: 'GET'},
-                {title: 'إنشاء مناقصة جديدة', path: `api/tenders/new`, method: 'POST'},
+                {title: 'المناقصات الجارية', path: `api/tenders/open/${res.locals.username}`},
+                {title: 'المناقصات المغلقة', path: `api/tenders/closed/${res.locals.username}`},
+                {title: 'أرشيف المناقصات', path: `api/tenders/resolved`},
+                {title: 'إنشاء مناقصة جديدة', path: `api/tenders/new`},
             ]
         });
     } else {
