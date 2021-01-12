@@ -20,14 +20,14 @@
         [...$('.h-nav-item')][0].click();
     });
 
-    function popUp(path) {
+    function popUp(title, path) {
         event.preventDefault();
         $.ajax({
             url: path,
             method: 'GET',
             success: (data) => {
                 let ejsData = ejs.render(popUpTemplate, {
-                    title: 'المناقصات',
+                    title: title,
                     tableCount: 1,
                     columns: data.columns,
                     tuples: data.tuples
@@ -35,9 +35,21 @@
                 $('pop-up-template').html(ejsData);
                 styleTables({}, 1);
             },
-            error: (xhr, ajaxOptions, thrownError) => {
-                let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});
-                $('pop-up-template').html(ejsData);
+            error: () => {
+                $.alert({
+                    title: 'أوبس!',
+                    icon: 'fas fa-exclamation-triangle',
+                    draggable: false,
+                    rtl: true,
+                    closeIcon: true,
+                    type: 'red',
+                    content: `حدث خطأ أثناء تحميل ${title}!`,
+                    buttons: {
+                        cancel: {
+                            text: 'حسنًا'
+                        }
+                    }
+                });
             }
         });
     }
@@ -45,9 +57,9 @@
     function renderLinks() {
         [...$('td')].filter(item => item.getAttribute('field') === 'offers').forEach((item) => {
             let path = `/${item.innerHTML}`;
-            let text = 'أنقر هنا لرؤية كافة العروض';
+            let text = 'قائمة العروض';
             item.innerHTML = `
-                <a class="d-link" onclick="popUp('${path}');" style="cursor: pointer;">
+                <a class="d-link" onclick="popUp('العروض', ${path}');" style="cursor: pointer;">
                     <i class="fas fa-clipboard-list"></i> ${text}
                 </a>
             `;

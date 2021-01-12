@@ -19,6 +19,62 @@
     $(document).ready(() => {
         [...$('.h-nav-item')][0].click();
     });
+
+    function popUp(title, path) {
+        event.preventDefault();
+        $.ajax({
+            url: path,
+            method: 'GET',
+            success: (data) => {
+                let ejsData = ejs.render(popUpTemplate, {
+                    title: title,
+                    tableCount: 1,
+                    columns: data.columns,
+                    tuples: data.tuples
+                });
+                $('pop-up-template').html(ejsData);
+                styleTables({}, 1);
+            },
+            error: () => {
+                $.alert({
+                    title: 'أوبس!',
+                    icon: 'fas fa-exclamation-triangle',
+                    draggable: false,
+                    rtl: true,
+                    closeIcon: true,
+                    type: 'red',
+                    content: `حدث خطأ أثناء تحميل ${title}!`,
+                    buttons: {
+                        cancel: {
+                            text: 'حسنًا'
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function renderLinks() {
+        [...$('td')].filter(item => item.getAttribute('field') === 'requested_items').forEach((item) => {
+            let path = `/${item.innerHTML}`;
+            let text = 'قائمة المنتجات';
+            item.innerHTML = `
+                <a class="d-link" onclick="popUp('المنتجات', ${path}');" style="cursor: pointer;">
+                    <i class="fas fa-clipboard-list"></i> ${text}
+                </a>
+            `;
+        });
+        [...$('td')].filter(item => item.getAttribute('field') === 'offers').forEach((item) => {
+            let path = `/${item.innerHTML}`;
+            let text = 'قائمة العروض';
+            item.innerHTML = `
+                <a class="d-link" onclick="popUp('العروض', '${path}');" style="cursor: pointer;">
+                    <i class="fas fa-clipboard-list"></i> ${text}
+                </a>
+            `;
+        });
+    }
+
     function showRequests(path, method) {
         event.preventDefault();
         $.ajax({
@@ -26,19 +82,20 @@
             method: method,
             data: {},
             success: (data) => {
-                let ejsData = ejs.render(tableTemplate, {
-                    title: 'طلبات الاستيراد',
-                    tableCount: 0,
-                    columns: [
-                        'الخانة الأولى',
-                        'الخانة الثانية',
-                        'الخانة الثالثة',
-                        'الخانة الرابعة'
-                    ],
-                    tuples: data
-                });
-                $('requests-template').html(ejsData);
-                styleTables({}, 0);
+                if (path === '/api/requests/new') {
+                    $('requests-template').html(data);
+                    $('.all-wrapper').css('overflow-y', 'hidden');
+                } else {
+                    let ejsData = ejs.render(tableTemplate, {
+                        title: 'طلبات الاستيراد',
+                        tableCount: 0,
+                        columns: data.columns,
+                        tuples: data.tuples
+                    });
+                    $('requests-template').html(ejsData);
+                    styleTables({}, 0);
+                    $('.all-wrapper').css('overflow-y', 'scroll');
+                }
             },
             error: (xhr, ajaxOptions, thrownError) => {
                 let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});

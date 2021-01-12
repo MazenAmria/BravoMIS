@@ -16,8 +16,7 @@ router.get('/tenders', (req, res) => {
             tabs: [
                 {title: 'المناقصات الجارية', path: `api/tenders/open/${res.locals.username}`},
                 {title: 'المناقصات المغلقة', path: `api/tenders/closed/${res.locals.username}`},
-                {title: 'أرشيف المناقصات', path: `api/tenders/resolved`},
-                {title: 'إنشاء مناقصة جديدة', path: `api/tenders/new`},
+                {title: 'أرشيف المناقصات', path: `api/tenders/resolved`}
             ]
         });
     } else {
