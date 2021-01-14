@@ -34,6 +34,7 @@ router.get('/', (req, res) => {
         }
         res.render('home', {
             name: res.locals.name,
+            username: res.locals.username,
             role: res.locals.role,
             menu: menu
         });

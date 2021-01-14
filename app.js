@@ -7,6 +7,7 @@ const errorRoute = require("./routes/errorRoute");
 const categoriesRoute = require("./routes/categoriesRoute");
 const managerCustomersRoute = require("./routes/managerCustomersRoute");
 const salesRoute = require("./routes/salesRoute");
+const invoiceRoute = require("./routes/invoiceRoute");
 const cookieParser = require('cookie-parser');
 const {reqAuth} = require('./middlewares/authMiddleware');
 
@@ -35,4 +36,5 @@ app.use(employeesRoute);
 app.use(categoriesRoute);
 app.use(managerCustomersRoute);
 app.use(salesRoute);
+app.use(invoiceRoute);
 app.use(errorRoute);

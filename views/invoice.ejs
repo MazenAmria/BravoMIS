@@ -1,0 +1,205 @@
+<div class='all-wrapper'>
+    <div class='row'>
+        <div class='add-invoice col-xs-12'>
+            <div class='invoice-add-show widget'>
+                <div class='widget-title'>
+                    <h2>إضافة <span>فاتورة</span></h2>
+                </div>
+                <form id='add-invoice'>
+                    <div class='invoice-section'>
+                        <label for="customer"> إسم الزبون</label>
+                        <select name='customer' id='customer'>
+                            <option value='null'>بلا زبون</option>
+                            <% for(customer in customers){ %>
+                                <option value='<%= customers[customer].customer_id %>'><%= customers[customer].customer_name %></option>
+
+                            <% } %>
+                        </select>    
+                    </div>
+                    <div class='invoice-section'>
+                        <label for="addItem">إضافة منتج</label>
+                        <div class='addItem-section row-medium clearfix'>
+                            <div class='chooseCategories col-xs-4'>
+                                <select id='categories'>
+                                    <option value='all'>كل الأصناف</option>
+                                    <% for(category in categories){ %>
+                                        <option value='<%= categories[category].category_id %>'><%= categories[category].category_name %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class='chooseItem col-xs-4'>
+                                <select id='items'>
+                                    <% for(item in items){ %>
+                                        <option value='<%= items[item].item_id %>'><%= items[item].item_name %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class='quantity col-xs-1'>
+                                <input type="number" id="quantity" name="quantity" placeholder="الكمية" min="1" max='<%= items[0].remaining_quantity %>'>
+                            </div>
+                            <div class='addItem-button col-xs-1'><button class='btn-blue'><i class='fas fa-plus'></i></button></div>
+                        </div>
+                    </div>
+                    <div class='invoice-section invoice-items-table'>
+                        <table class="invoiceItems display" style="width:100%">
+                            <thead>
+                            <tr>
+                                <th>المنتج</th>
+                                <th>الكمية</th>
+                                <th>سعر الوحدة</th>
+                                <th>السعر الكلي</th>
+                                <th>السعر بعد الخصم</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class='main-background submit-invoice mbutton'><span><i
+                                class="fas fa-plus"></i></span>إضافة فاتورة</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let getItemPrice = (itemId) => {
+        let price = null;
+        $.ajax({
+            async: false,        
+            url:`/invoice/getItemPrice/${itemId}`,
+            type: `GET`,
+            success: (data) => {
+                price = data[0].selling_price;
+            }
+        });
+        return price;
+    };
+    let getItemDiscount = (itemId, quantity) => {
+        let discount = {percentage:0, id:null};
+        $.ajax({
+            async: false,        
+            url:`/invoice/getItemDiscount/${itemId}/${quantity}`,
+            type: `GET`,
+            success: (data) => {
+               if(data[0].discount_id != null){
+                discount.percentage = data[0].discount_percentage,
+                discount.id = data[0].discount_id
+               }
+            }
+        });
+        return discount;
+    };
+     $(document).ready(() => {
+        $('#customer').select2();
+        $('#categories').select2();
+        $('#items').select2();
+
+        $("#categories").on('select2:select', () => {
+            let categoryId = $('#categories').select2('data')[0].element.value;
+            $.ajax({
+                url:`/items/api/${categoryId}`,
+                type: 'GET',
+                success: (data) => {
+                    $('#items').select2('destroy').empty().select2({
+                        data:data
+                    }).trigger('change');
+                }
+            });
+            
+        });
+        let invoiceTable = $('.invoiceItems').DataTable({
+            dom: 'Blfrtip',
+            select: {
+                style: 'multi'
+            },
+            columnDefs: [
+                {
+                    targets: 0,
+                    className: 'itemName'
+                },
+                {
+                    targets: 1,
+                    className: 'quantity'
+                },
+                {
+                    targets: 2,
+                    className: 'pricePerUnit'
+                },
+                {
+                    targets: 3,
+                    className: 'price'
+                },
+                {
+                    targets: 4,
+                    className: 'priceAfterDiscount'
+                }
+            ],
+            language: {
+                url: 'DatatablesArabic.json'
+            },
+            buttons: [
+                {
+                    text: 'حذف',
+                    attr: { id: 'deleteButton' },
+                    enabled: false,
+                // action: 
+                },
+                {
+                    text: 'تعديل',
+                    attr: {id: 'editButton' },
+                    enabled: false,
+                    //action: 
+                }
+            ]
+        });
+
+        $('.addItem-button button').on('click', (e) => {
+            e.preventDefault();
+            let itemId = $('#items').select2('data')[0].element.value,
+                itemName = $('#items').select2('data')[0].text,
+                itemQuantity = $("#quantity").val(),
+                itemPrice = getItemPrice(itemId),
+                itemDiscount = getItemDiscount(itemId, itemQuantity).percentage;
+                console.log(itemDiscount);
+                let row = invoiceTable.row(`[itemId=${itemId}]`);
+            if(row.length == 0){
+                
+                let addedRow = invoiceTable.row.add( [
+                    itemName,
+                    itemQuantity,
+                    itemPrice,
+                    itemQuantity * itemPrice,
+                    itemQuantity * itemPrice - itemQuantity * itemPrice * itemDiscount/100
+                ] ).draw( false ).node();
+                $(addedRow).attr('itemId', itemId);
+            }else{
+                let prevQuant = $(row.node().children[1]).text(),
+                    newQuant = parseInt(prevQuant) + parseInt(itemQuantity),
+                    itemDiscount = getItemDiscount(itemId, newQuant).percentage;
+                $(row.node().children[1]).text(newQuant);
+                $(row.node().children[3]).text(newQuant * itemPrice);
+                $(row.node().children[4]).text(newQuant * itemPrice - newQuant * itemPrice * itemDiscount/100);
+            }
+            
+        });
+        $('.submit-invoice').on('click', (e) => {
+            e.preventDefault();
+            let customerId = $('#customer').select2('data')[0].element.value,
+                cashierId = '<%= username%>';
+            
+            $.ajax({
+                url:`/invoice/insert`,
+                type: 'POST',
+                data: {customerId, cashierId},
+                success: () => {
+
+                }
+            });    
+            
+        });
+
+     });
+</script>

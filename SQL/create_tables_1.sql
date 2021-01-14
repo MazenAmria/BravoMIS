@@ -71,9 +71,11 @@ CREATE TABLE IF NOT EXISTS invoice_includes_item (
     price_per_unit DOUBLE NOT NULL,
     item_id VARCHAR(200) NOT NULL,
     invoice_id INTEGER NOT NULL,
+    discount_id INTEGER,
     PRIMARY KEY (item_id, invoice_id),
     FOREIGN KEY (item_id) REFERENCES item(item_id),
-    FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id)
+    FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id),
+    FOREIGN KEY (discount_id) REFERENCES item_discount(discount_id)
 );
 
 -- BY: AHMAD KHATIB (PART 2)
