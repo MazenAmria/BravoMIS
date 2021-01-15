@@ -1,0 +1,159 @@
+<div class='all-wrapper'>
+    <div class='row'>
+        <div class='invoices-filter-wrapper col-xs-6'>
+            <div class='invoices-filter widget'>
+                <div class='widget-title'>
+                    <h2>فلترة <span>الفواتير</span></h2>
+                </div>
+                <form id="invoices-filter">
+                    <label>معرف الفاتورة</label>
+                    <div class='row-medium'>
+                        <div class='col-xs-6'>
+                            <input name='invoice_id' class='invoice_id_min' type='number' placeholder="من">
+                        </div>
+                        <div class='col-xs-6'>
+                            <input name='invoice_id2' class='invoice_id_max' type='number' placeholder="إلى">
+                        </div>
+                    </div>
+                    <label>التاريخ</label>
+                    <div class='row-medium'>
+                        <div class='col-xs-6'>
+                            <input name='invoice_date' class='invoice_date_min' type='date' placeholder="من">
+                        </div>
+                        <div class='col-xs-6'>
+                            <input name='invoice_date2' class='invoice_date_max' type='date' placeholder="إلى">
+                        </div>
+                    </div>
+                    <label>الزبون</label>
+                    <select class='choose-customer'>
+                        <option value=''>الكل</option>
+                        <%for(key in customers){%>
+                            <option value='<%=customers[key].customer_id%>'><%=customers[key].customer_name%></option>
+                        <%}%>
+                    </select>
+                    <label>أمين الصندوق</label>
+                    <select class='choose-employee'>
+                        <option value=''>الكل</option>
+                        <%for(key in employees){%>
+                            <option value='<%=employees[key].emp_id%>'><%=employees[key].emp_name%></option>
+                        <%}%>
+                    </select>
+                    <button class='invoices-filter-button btn-blue'>فلترة</button>
+                </form>
+            </div>
+        </div>
+        <div class='invoices-table-wrapper col-xs-12'>
+            <div class='invoice-table widget'>
+                <div class='widget-title'>
+                    <h2>الفواتير</h2>
+                </div>
+                <table class="invoices display" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>معرّف الفاتورة</th>
+                        <th>التاريخ</th>
+                        <th>السعر الكلي</th>
+                        <th>السعر الكلي بعد الخصم</th>
+                        <th>الزبون</th>
+                        <th>أمين الصندوق</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <%for(invoice in invoices){%>
+                            <tr>
+                                <%for(column in invoices[invoice]){%>
+                                    <td><%=invoices[invoice][column]%></td>
+                                <%}%>
+                            </tr>
+                        <%}%>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(() => {
+
+        let invoices = $('.invoices').DataTable({
+            dom: 'Blfrtip',
+            select: true,
+            columnDefs: [
+                {
+                    targets: 0,
+                    className: 'invoice_id'
+                },
+                {
+                    targets: 1,
+                    className: 'invoice_time'
+                },
+                {
+                    targets: 2,
+                    className: 'total_price'
+                },
+                {
+                    targets: 3,
+                    className: 'total_price_discount'
+                },
+                {
+                    targets: 4,
+                    className: 'cahsier_name'
+                }
+            ],
+            language: {
+                url: 'DatatablesArabic.json'
+            },
+            buttons: [
+                {
+                    text: 'عرض',
+                    attr: { id: 'showButton' },
+                    enabled: false,
+                    action: (e, buttonApi, dt, node, config) => {
+                        e.preventDefault();
+                        let row = invoices.row( { selected: true } ).node(),
+                            invoice_id = $(row).find(".invoice_id ").text();
+                        route(`/invoice/${invoice_id}`);
+                    }
+                }
+            ]
+        });
+        invoices.on('select deselect', function ( e, dt, type, indexes ) {
+            let selectedRows = invoices.rows( { selected: true } ).count();
+            if(selectedRows > 0){
+                invoices.button( 0 ).enable(true);
+            }else{
+                invoices.button( 0 ).enable(false);
+            }
+        });
+
+        $('.invoices-filter-button').on('click', (e) => {
+            e.preventDefault();
+
+            let invoice_id_min = $('.invoice_id_min').val(),
+                invoice_id_max = $('.invoice_id_max').val(),
+                invoice_date_min = $('.invoice_date_min').val(),
+                invoice_date_max = $('.invoice_date_max').val(),
+                customer = $('.choose-customer').val(),
+                employee = $('.choose-employee').val();
+
+            $.ajax({
+                url: '/invoices',
+                method: 'GET',
+                data: {
+                    invoice_id_min,
+                    invoice_id_max,
+                    invoice_discount_min,
+                    invoice_discount_max,
+                    customer,
+                    employee
+                },
+                success: (data, status) => {
+                    $('page-template').html(data);
+                }
+            });
+        });
+     });
+
+
+</script>

@@ -1,0 +1,107 @@
+<div class="all-wrapper">
+    <div class='profit-wrapper'>
+        <div class='profit widget'>
+            <div class='widget-title'>
+                <h2>تقارير عن <span>الربح</span></h2>
+            </div>
+            <div class='profit-date clearfix'>
+                <label>إختيار يوم لعرض تقارير الربع</label>
+                <input class='choose-prift-date-min' type='date'>
+                <input class='choose-prift-date-max' type='date'>
+            </div>
+            <div class='row'>
+                <div class='col-sm-4'>
+                    <div class='total-invoices'>
+                        <div class='box-icon'>
+
+                        </div>
+                        <div class='box-title'>
+                            عدد الفواتير
+                        </div>
+                        <div class='box-text'>
+
+                        </div>
+                    </div>
+                </div>
+                <div class='col-sm-4'>
+                    <div class='total-sales'>
+                        <div class='box-icon'>
+
+                        </div>
+                        <div class='box-title'>
+                            عدد المبيعات
+                        </div>
+                        <div class='box-text'>
+
+                        </div>
+                    </div>
+                </div>
+                <div class='col-sm-4'>
+                    <div class='total-rev'>
+                        <div class='box-icon'>
+
+                        </div>
+                        <div class='box-title'>
+                            الإيرادات
+                        </div>
+                        <div class='box-text'>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(() => {
+let getTotalInvoices = (date_min, date_max) => {
+    $.ajax({
+        async:false,
+        url: `/reports/total-invoices/${date_min}/${date_max}`,
+        success: (data) => {
+            $(".total-invoices .box-text").text(data[0].total);
+        }
+    });
+}
+let getTotalSales = (date_min, date_max) => {
+    $.ajax({
+        async:false,
+        url: `/reports/total-sales/${date_min}/${date_max}`,
+        success: (data) => {
+            $(".total-sales .box-text").text(data[0].total);
+        }
+    });
+}
+let getTotalRev = (date_min, date_max) => {
+    $.ajax({
+        async:false,
+        url: `/reports/total-rev/${date_min}/${date_max}`,
+        success: (data) => {
+            $(".total-rev .box-text").text(data[0].total);
+        }
+    });
+}
+getTotalInvoices('now', 'now');
+getTotalSales('now', 'now');
+getTotalRev('now', 'now');
+
+$('.choose-prift-date-min, .choose-prift-date-max').on('change', () => {
+    let date_min = $('.choose-prift-date-min').val();
+    let date_max = $('.choose-prift-date-max').val();
+    if(date_min.length == 0)
+        date_min = 'now';
+    
+    if(date_max.length == 0)
+        date_max = 'now';
+    getTotalInvoices(date_min, date_max);
+    getTotalSales(date_min, date_max);
+    getTotalRev(date_min, date_max);
+});
+
+
+
+});
+</script>

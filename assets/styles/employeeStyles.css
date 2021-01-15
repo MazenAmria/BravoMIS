@@ -132,3 +132,45 @@ button.btn-blue {
     padding: 22px;
     border: 1px solid #eee;
 }
+.invoice-total-price {
+    font-size: 16px;
+}
+.invoices-table-wrapper {
+    margin-top: 30px;
+}
+button.go-back:hover {
+    color: #222;
+}
+
+button.go-back {
+    border: none;
+    background: none;
+    font-size: 22px;
+    color: #666;
+    line-height: 0;
+}
+form#invoices-filter input {
+    width: 100%;
+    border: 2px solid #eee;
+    padding: 0 15px;
+    height: 40px;
+}
+button.invoices-filter-button {
+    width: initial;
+    padding: 0 20px;
+    margin-top: 20px;
+}
+form#invoices-filter .choose-customer {
+    margin-bottom: 20px;
+}
+.total-invoices, .total-sales, .total-rev {
+    background: #a7b83b;
+    color: #fff;
+    text-align: center;
+    font-size: 16px;
+    border-radius: 3px;
+    padding: 30px 0px;
+}
+.profit-date {
+    margin-bottom: 20px;
+}

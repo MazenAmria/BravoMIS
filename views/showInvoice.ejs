@@ -1,0 +1,65 @@
+<div class='all-wrapper'>
+    <div class='widget'>
+        <button class='go-back'><i class="fas fa-arrow-right"></i></button>
+        <div class='widget-title'>
+            <h2>تفاصيل فاتورة رقم <span><%= invoice_id%></span></h2>
+        </div>
+        <table class="invoiceItems display" style="width:100%">
+            <thead>
+            <tr>
+                <th>المنتج</th>
+                <th>الكمية</th>
+                <th>سعر الوحدة</th>
+                <th>السعر الكلي</th>
+                <th>السعر بعد الخصم</th>
+            </tr>
+            </thead>
+            <tbody>
+                <%for(key in results){%>
+                    <tr>
+                        <%for(column in results[key]){%>
+                            <td><%=results[key][column]%></td>
+                        <%}%>
+                    </tr>
+                <%}%>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(() => {
+    $(".go-back").on('click', () => {
+        route('/invoices');
+    });
+    let invoiceTable = $('.invoiceItems').DataTable({
+            dom: 'Blfrtip',
+            select: true,
+            columnDefs: [
+                {
+                    targets: 0,
+                    className: 'itemName'
+                },
+                {
+                    targets: 1,
+                    className: 'quantity'
+                },
+                {
+                    targets: 2,
+                    className: 'pricePerUnit'
+                },
+                {
+                    targets: 3,
+                    className: 'price'
+                },
+                {
+                    targets: 4,
+                    className: 'priceAfterDiscount'
+                }
+            ],
+            language: {
+                url: 'DatatablesArabic.json'
+            }
+        });
+});
+</script>

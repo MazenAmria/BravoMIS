@@ -12,6 +12,7 @@ const categoriesRoute = require("./routes/categoriesRoute");
 const managerCustomersRoute = require("./routes/managerCustomersRoute");
 const salesRoute = require("./routes/salesRoute");
 const invoiceRoute = require("./routes/invoiceRoute");
+const reportsRoute = require("./routes/reportsRoute");
 const cookieParser = require('cookie-parser');
 const {reqAuth} = require('./middlewares/authMiddleware');
 const db = require('./dbConnectionMulti');
@@ -49,6 +50,7 @@ app.use(categoriesRoute);
 app.use(managerCustomersRoute);
 app.use(salesRoute);
 app.use(invoiceRoute);
+app.use(reportsRoute);
 app.use(errorRoute);
 
 // Check the deadlines every 3 minutes

@@ -55,71 +55,105 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class='invoice-section invoice-total-price'>
+                        <div class='total-price'>السعر الكلي <span>0</span></div>
+                        <div class='total-price-discount'>السعر الكلي بعد الخصم <span>0</span></div>
+                    </div>
+
                     <button class='main-background submit-invoice mbutton'><span><i
                                 class="fas fa-plus"></i></span>إضافة فاتورة</button>
                 </form>
             </div>
         </div>
-
+        <div class='clearfix'></div>
+        <div class='invoices-table-wrapper col-xs-12'>
+            <div class='invoice-table widget'>
+                <div class='widget-title'>
+                    <h2>الفواتير</h2>
+                </div>
+                <table class="invoices display" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>معرّف الفاتورة</th>
+                        <th>التاريخ</th>
+                        <th>السعر الكلي</th>
+                        <th>السعر الكلي بعد الخصم</th>
+                        <th>الزبون</th>
+                        <th>أمين الصندوق</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <%for(invoice in invoices){%>
+                            <tr>
+                                <%for(column in invoices[invoice]){%>
+                                    <td><%=invoices[invoice][column]%></td>
+                                <%}%>
+                            </tr>
+                        <%}%>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    let getItemPrice = (itemId) => {
-        let price = null;
-        $.ajax({
-            async: false,        
-            url:`/invoice/getItemPrice/${itemId}`,
-            type: `GET`,
-            success: (data) => {
-                price = data[0].selling_price;
-            }
-        });
-        return price;
-    };
-    let getItemRemainingQuantity = (itemId) => {
-        let remaining_quantity = null;
-        $.ajax({
-            async: false,        
-            url:`/itemsQuantity/api/${itemId}`,
-            type: `GET`,
-            success: (data) => {
-                remaining_quantity = data[0].remaining_quantity;
-            }
-        });
-        return remaining_quantity;
-    };
-    let getItemDiscount = (itemId, quantity) => {
-        let discount = {percentage:0, id:null};
-        $.ajax({
-            async: false,        
-            url:`/invoice/getItemDiscount/${itemId}/${quantity}`,
-            type: `GET`,
-            success: (data) => {
-               if(data[0].discount_id != null){
-                discount.percentage = data[0].discount_percentage,
-                discount.id = data[0].discount_id
-               }
-            }
-        });
-        return discount;
-    };
-    let getInvoiceDiscount = (price) => {
-        let discount = {percentage:0, id:null};
-        $.ajax({
-            async: false,        
-            url:`/invoice/getinvoiceDiscount/${price}`,
-            type: `GET`,
-            success: (data) => {
-               if(data[0].discount_id != null){
-                discount.percentage = data[0].discount_percentage,
-                discount.id = data[0].discount_id
-               }
-            }
-        });
-        return discount;
-    };
     $(document).ready(() => {
+        let getItemPrice = (itemId) => {
+            let price = null;
+            $.ajax({
+                async: false,        
+                url:`/invoice/getItemPrice/${itemId}`,
+                type: `GET`,
+                success: (data) => {
+                    price = data[0].selling_price;
+                }
+            });
+            return price;
+        };
+        let getItemRemainingQuantity = (itemId) => {
+            let remaining_quantity = null;
+            $.ajax({
+                async: false,        
+                url:`/itemsQuantity/api/${itemId}`,
+                type: `GET`,
+                success: (data) => {
+                    remaining_quantity = data[0].remaining_quantity;
+                }
+            });
+            return remaining_quantity;
+        };
+        let getItemDiscount = (itemId, quantity) => {
+            let discount = {percentage:0, id:null};
+            $.ajax({
+                async: false,        
+                url:`/invoice/getItemDiscount/${itemId}/${quantity}`,
+                type: `GET`,
+                success: (data) => {
+                if(data[0].discount_id != null){
+                    discount.percentage = data[0].discount_percentage,
+                    discount.id = data[0].discount_id
+                }
+                }
+            });
+            return discount;
+        };
+        let getInvoiceDiscount = (price) => {
+            let discount = {percentage:0, id:null};
+            $.ajax({
+                async: false,        
+                url:`/invoice/getinvoiceDiscount/${price}`,
+                type: `GET`,
+                success: (data) => {
+                if(data[0].discount_id != null){
+                    discount.percentage = data[0].discount_percentage,
+                    discount.id = data[0].discount_id
+                }
+                }
+            });
+            return discount;
+        };
+        
         $('#customer').select2();
         $('#categories').select2();
         $('#items').select2();
@@ -138,13 +172,9 @@
             
         });
 
-
-
         let invoiceTable = $('.invoiceItems').DataTable({
             dom: 'Blfrtip',
-            select: {
-                style: 'multi'
-            },
+            select: true,
             columnDefs: [
                 {
                     targets: 0,
@@ -175,15 +205,30 @@
                     text: 'حذف',
                     attr: { id: 'deleteButton' },
                     enabled: false,
-                // action: 
-                },
-                {
-                    text: 'تعديل',
-                    attr: {id: 'editButton' },
-                    enabled: false,
-                    //action: 
+                    action: (e, buttonApi, dt, node, config) => {
+                        e.preventDefault();
+                        let row = invoiceTable.row({selected: true}),
+                            rowPrice = parseFloat($(row.node()).find(".priceAfterDiscount").text());
+                        $(".total-price span").text(parseFloat($(".total-price span").text()) - rowPrice);
+                        let totalPriceBeforeDiscount = parseFloat($(".total-price span").text()),
+                            invoice_discount = getInvoiceDiscount(totalPriceBeforeDiscount).percentage;
+
+                        $(".total-price-discount span").text(totalPriceBeforeDiscount - totalPriceBeforeDiscount * invoice_discount/100);
+                        row.remove().draw(false);
+                    }
                 }
             ]
+        });
+
+        invoiceTable.on('select deselect', function ( e, dt, type, indexes ) {
+            let selectedRows = invoiceTable.rows( { selected: true } ).count();
+            if(selectedRows > 0){
+                invoiceTable.button( 0 ).enable(true);
+                invoiceTable.button( 1 ).enable(true);
+            }else{
+                invoiceTable.button( 0 ).enable(false);
+                invoiceTable.button( 1 ).enable(false);
+            }
         });
 
         $('.addItem-button button').on('click', (e) => {
@@ -223,16 +268,17 @@
             }else{
             
                 if(row.length == 0){
-                    
+                    let rowPriceDiscount = itemQuantity * itemPrice - itemQuantity * itemPrice * itemDiscount/100;
                     let addedRow = invoiceTable.row.add( [
                         itemName,
                         itemQuantity,
                         itemPrice,
                         itemQuantity * itemPrice,
-                        itemQuantity * itemPrice - itemQuantity * itemPrice * itemDiscount/100
+                        rowPriceDiscount
                     ] ).draw( false ).node();
                     $(addedRow).attr('itemId', itemId);
                     $(addedRow).attr('id', itemId);
+                    $(".total-price span").text(parseFloat($(".total-price span").text()) + rowPriceDiscount);
                 }else{
                     let prevQuant = $(row.node().children[1]).text(),
                         newQuant = parseInt(prevQuant) + parseInt(itemQuantity),
@@ -240,8 +286,17 @@
                     $(row.node().children[1]).text(newQuant);
                     $(row.node().children[3]).text(newQuant * itemPrice);
                     $(row.node().children[4]).text(newQuant * itemPrice - newQuant * itemPrice * itemDiscount/100);
+
+                    let rowPriceDiscount = itemQuantity * itemPrice - itemQuantity * itemPrice * itemDiscount/100;
+                    
+                    $(".total-price span").text(parseFloat($(".total-price span").text()) + rowPriceDiscount);
                 }
             }
+
+            let totalPriceBeforeDiscount = parseFloat($(".total-price span").text()),
+                invoice_discount = getInvoiceDiscount(totalPriceBeforeDiscount).percentage;
+
+            $(".total-price-discount span").text(totalPriceBeforeDiscount - totalPriceBeforeDiscount * invoice_discount/100);
             
         });
         $('.submit-invoice').on('click', (e) => {
@@ -321,14 +376,12 @@
                                     rtl:true,
                                     closeIcon: true,
                                     type: 'green',
-                                    content: `<div>تمت الإضافة بنجاح</div>
-                                    <div>مجموع الفاتورة = ${totalPrice}<div>
-                                        <div>مجموع الفاتورة بعد الخصم = ${totalPrice - totalPrice * invoice_discount_percentage / 100}</div>`,
+                                    content: `تمت الإضافة بنجاح`,
                                     buttons: {
                                         cancel: {
                                             text: 'حسنا',
                                             action: function () {
-
+                                                route('/invoices');
                                             }
                                         }
                                     }
@@ -341,5 +394,59 @@
             }
         });
 
+
+        let invoices = $('.invoices').DataTable({
+            dom: 'Blfrtip',
+            select: true,
+            columnDefs: [
+                {
+                    targets: 0,
+                    className: 'invoice_id'
+                },
+                {
+                    targets: 1,
+                    className: 'invoice_time'
+                },
+                {
+                    targets: 2,
+                    className: 'total_price'
+                },
+                {
+                    targets: 3,
+                    className: 'total_price_discount'
+                },
+                {
+                    targets: 4,
+                    className: 'cahsier_name'
+                }
+            ],
+            language: {
+                url: 'DatatablesArabic.json'
+            },
+            buttons: [
+                {
+                    text: 'عرض',
+                    attr: { id: 'showButton' },
+                    enabled: false,
+                    action: (e, buttonApi, dt, node, config) => {
+                        e.preventDefault();
+                        let row = invoices.row( { selected: true } ).node(),
+                            invoice_id = $(row).find(".invoice_id ").text();
+                        route(`/invoice/${invoice_id}`);
+                    }
+                }
+            ]
+        });
+        invoices.on('select deselect', function ( e, dt, type, indexes ) {
+            let selectedRows = invoices.rows( { selected: true } ).count();
+            if(selectedRows > 0){
+                invoices.button( 0 ).enable(true);
+            }else{
+                invoices.button( 0 ).enable(false);
+            }
+        });
+
      });
+
+
 </script>
