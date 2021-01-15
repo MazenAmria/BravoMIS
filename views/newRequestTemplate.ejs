@@ -1,102 +1,288 @@
 <div class="row">
     <div class='col-sm-6 col-xs-12'>
-        <div class='widget'>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <form>
-                <hr />
-                <div style="
-                height: calc(100vh - 435px);
-                overflow-y: scroll;
-                padding: 20px;">
-                    <h2>طلبية <span>جديدة</span></h2>
-                    <h2>طلبية <span>جديدة</span></h2>
-                    <h2>طلبية <span>جديدة</span></h2>
-                    <h2>طلبية <span>جديدة</span></h2>
-                    <h2>طلبية <span>جديدة</span></h2>
-                    <h2>طلبية <span>جديدة</span></h2>
-                    <h2>طلبية <span>جديدة</span></h2>
-                    <h2>طلبية <span>جديدة</span></h2>
-                    <h2>طلبية <span>جديدة</span></h2>
-                    <h2>طلبية <span>جديدة</span></h2>
-                </div>
-                <hr />
-                <button class='main-background submit-employee mbutton'><span><i class="fas fa-plus"></i></span>تثبيت الطلبية</button>
-            </form>
+        <div class='widget' style="height: calc(100vh - 260px); overflow-y: hidden;">
+            <selected-template></selected-template>
+            <button class='main-background submit-employee mbutton' onclick="submitRequest()"><span><i class="fas fa-plus"></i></span>تثبيت الطلبية</button>
         </div>
     </div>
     <div class='col-sm-6 col-xs-12'>
-        <div class='widget' style="height: calc(100vh - 260px); overflow-y: scroll;">
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
-            <div class='widget-title'>
-                <h2>طلبية <span>جديدة</span></h2>
-            </div>
+        <div class="widget" style="height: calc(100vh - 260px); overflow-y: hidden;">
+            <items-template></items-template>
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(() => {
+        showItems();
+        showSelected();
+    });
+
+    function submitRequest() {
+        let items = $('.genericTable0').DataTable().rows().data().toArray();
+        if (!items || items.length < 1) {
+            $.alert({
+                title: `غير مكتمل!`,
+                icon: 'fas fa-exclamation-triangle',
+                draggable: false,
+                rtl: true,
+                closeIcon: true,
+                type: 'red',
+                content: 'اختر منتجات للطلب!',
+                buttons: {
+                    cancel: {
+                        text: 'حسنًا',
+                        keys: ['enter']
+                    }
+                }
+            });
+            return;
+        }
+        $.ajax({
+            url: 'api/requests/new',
+            method: 'POST',
+            data: {
+                items: items
+            },
+            success: () => {
+                $.alert({
+                    title: `نجاح!`,
+                    icon: 'fas fa-check',
+                    draggable: false,
+                    rtl: true,
+                    closeIcon: true,
+                    type: 'green',
+                    content: 'تم إضافة الطلب بنجاح :)',
+                    buttons: {
+                        cancel: {
+                            text: 'حسنًا',
+                            keys: ['enter']
+                        }
+                    }
+                });
+                [...$('.h-nav-item')][3].click();
+            },
+            error: () => {
+                $.alert({
+                    title: `أوبس!`,
+                    icon: 'fas fa-exclamation-triangle',
+                    draggable: false,
+                    rtl: true,
+                    closeIcon: true,
+                    type: 'red',
+                    content: 'حدث خطأ ما أثناء تسجيل الطلب، حاول مرة أخرى!',
+                    buttons: {
+                        cancel: {
+                            text: 'حسنًا',
+                            keys: ['enter']
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function showItems() {
+        $.ajax({
+            url: '/api/items',
+            method: 'GET',
+            data: {},
+            success: (data) => {
+                let ejsData = ejs.render(tableTemplateReduced, {
+                    tableCount: 1,
+                    columns: data.columns,
+                    tuples: data.tuples
+                });
+                $('items-template').html(ejsData);
+                styleTablesReduced(1, '37.3vh', [
+                    {
+                        text: 'إضافة',
+                        attr: { id: 'editButton' },
+                        enabled: false,
+                        action: function ( e, dt, node, config ) {
+                            let rows = dt.rows( { selected: true } );
+                            let name = rows.data()[0][1]
+                            $.confirm({
+                                title: `إضافة المنتج: ${name}`,
+                                icon: 'fas fa-tasks',
+                                draggable: false,
+                                rtl: true,
+                                closeIcon: true,
+                                type: 'blue',
+                                content: `
+                                            <span>الكمية المطلوبة:</span>
+                                            <input type="number" id="quantity" required>
+                                `,
+                                buttons: {
+                                    cancel: {
+                                        text: 'إلغاء'
+                                    },
+                                    submit: {
+                                        text: 'إضافة',
+                                        keys: ['enter'],
+                                        action: () => {
+                                            if ( $('#quantity')[0].validity.valid ) {
+                                                let otherTable = $('.genericTable0').DataTable();
+                                                data = [rows.data()[0][0], rows.data()[0][1], $('#quantity').val()];
+                                                otherTable.row.add(data).draw();
+                                                rows.remove().draw();
+                                                dt.button(0).enable(false);
+                                            } else {
+                                                $.alert({
+                                                    title: `غير مكتمل!`,
+                                                    icon: 'fas fa-exclamation-triangle',
+                                                    draggable: false,
+                                                    rtl: true,
+                                                    closeIcon: true,
+                                                    type: 'red',
+                                                    content: 'أدخل الكمية المطلوبة رجاءً',
+                                                    buttons: {
+                                                        cancel: {
+                                                            text: 'حسنًا',
+                                                            keys: ['enter']
+                                                        }
+                                                    }
+                                                });
+                                                return false;
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                ]);
+            },
+            error: (xhr, ajaxOptions, thrownError) => {
+                let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});
+                $('items-template').html(ejsData);
+            }
+        });
+    }
+
+    function showSelected() {
+        let ejsData = ejs.render(tableTemplateReduced, {
+            tableCount: 0,
+            columns: [
+                'المعرّف',
+                'اسم المنتج',
+                'الكمية المطلوبة'
+            ],
+            tuples: []
+        });
+        $('selected-template').html(ejsData);
+        styleTablesReduced(0, '27.3vh', [
+            {
+                text: 'حذف',
+                attr: { id: 'deleteButton' },
+                enabled: false,
+                action: function ( e, dt, node, config ) {
+                    $.confirm({
+                        title: `تأكيد!`,
+                        icon: 'fas fa-exclamation-triangle',
+                        draggable: false,
+                        rtl: true,
+                        closeIcon: true,
+                        type: 'red',
+                        content: 'هل أنت متأكد من أنك تريد حذف هذا المنتج من قائمة الطلبات؟',
+                        buttons: {
+                            cancel: {
+                                text: 'لا',
+                                keys: ['enter']
+                            },
+                            confirm: {
+                                text: 'نعم',
+                                action: () => {
+                                    let rows = dt.rows( { selected: true } );
+                                    $.ajax({
+                                        url: `api/items/${rows.data()[0][0]}`,
+                                        method: 'GET',
+                                        data: {},
+                                        success: (data) => {
+                                            let otherTable = $('.genericTable1').DataTable();
+                                            otherTable.row.add(Object.values(data)).draw();
+                                            rows.remove().draw();
+                                        },
+                                        error: () => {
+                                            $.alert({
+                                                title: 'أوبس!',
+                                                icon: 'fas fa-exclamation-triangle',
+                                                draggable: false,
+                                                rtl: true,
+                                                closeIcon: true,
+                                                type: 'red',
+                                                content: `حدث خطأ داخلي أثناء محاولة حذف المنتج! يرجى المحاولة مرة أخرى`,
+                                                buttons: {
+                                                    cancel: {
+                                                        text: 'حسنًا',
+                                                        keys: ['enter']
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                    dt.buttons().disable();
+                                }
+                            }
+                        }
+                    });
+                }
+            },
+            {
+                text: 'تعديل',
+                attr: { id: 'editButton' },
+                enabled: false,
+                action: function ( e, dt, node, config ) {
+                    let rows = dt.rows( { selected: true } );
+                    let name = rows.data()[0][1]
+                    $.confirm({
+                        title: `تعديل المنتج: ${name}`,
+                        icon: 'fas fa-tasks',
+                        draggable: false,
+                        rtl: true,
+                        closeIcon: true,
+                        type: 'blue',
+                        content: `
+                                    <span>الكمية المطلوبة:</span>
+                                    <input type="number" id="quantity" required>
+                                        `,
+                        buttons: {
+                            cancel: {
+                                text: 'إلغاء'
+                            },
+                            submit: {
+                                text: 'تعديل',
+                                keys: ['enter'],
+                                action: () => {
+                                    if ( $('#quantity')[0].validity.valid ) {
+                                        data = [rows.data()[0][0], rows.data()[0][1], $('#quantity').val()];
+                                        rows.remove();
+                                        dt.row.add(data).draw();
+                                        dt.buttons().disable();
+                                    } else {
+                                        $.alert({
+                                            title: `غير مكتمل!`,
+                                            icon: 'fas fa-exclamation-triangle',
+                                            draggable: false,
+                                            rtl: true,
+                                            closeIcon: true,
+                                            type: 'red',
+                                            content: 'أدخل الكمية المطلوبة رجاءً',
+                                            buttons: {
+                                                cancel: {
+                                                    text: 'حسنًا',
+                                                    keys: ['enter']
+                                                }
+                                            }
+                                        });
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        ]);
+    }
+</script>

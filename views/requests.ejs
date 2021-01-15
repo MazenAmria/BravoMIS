@@ -20,20 +20,36 @@
         [...$('.h-nav-item')][0].click();
     });
 
+
     function popUp(title, path) {
         event.preventDefault();
         $.ajax({
             url: path,
             method: 'GET',
+            data: {},
             success: (data) => {
-                let ejsData = ejs.render(popUpTemplate, {
+                let ejsData = data;
+                if (!path.match(/\/api\/tenders\/new.*/)) {
+                    ejsData = ejs.render(tableTemplateReduced, {
+                        tableCount: 1,
+                        columns: data.columns,
+                        tuples: data.tuples
+                    });
+                }
+                $.alert({
                     title: title,
-                    tableCount: 1,
-                    columns: data.columns,
-                    tuples: data.tuples
+                    draggable: false,
+                    rtl: true,
+                    closeIcon: true,
+                    type: 'blue',
+                    content: ejsData,
+                    onContentReady: () => {
+                        if (!path.match(/\/api\/tenders\/new.*/))
+                            styleTablesReduced(1, '50vh', [])
+                    },
+                    columnClass: 'col-md-6 col-md-offset-3',
+                    buttons: []
                 });
-                $('pop-up-template').html(ejsData);
-                styleTables({}, 1);
             },
             error: () => {
                 $.alert({
@@ -46,7 +62,8 @@
                     content: `حدث خطأ أثناء تحميل ${title}!`,
                     buttons: {
                         cancel: {
-                            text: 'حسنًا'
+                            text: 'حسنًا',
+                            keys: ['enter']
                         }
                     }
                 });
@@ -59,7 +76,7 @@
             let path = `/${item.innerHTML}`;
             let text = 'قائمة المنتجات';
             item.innerHTML = `
-                <a class="d-link" onclick="popUp('المنتجات', ${path}');" style="cursor: pointer;">
+                <a class="d-link" onclick="popUp('المنتجات', '${path}');" style="cursor: pointer;">
                     <i class="fas fa-clipboard-list"></i> ${text}
                 </a>
             `;
@@ -73,6 +90,15 @@
                 </a>
             `;
         });
+        [...$('td')].filter(item => item.getAttribute('field') === 'tender').forEach((item) => {
+            let path = `/${item.innerHTML}?requestId=${item.parentElement.children[0].innerHTML}`;
+            let text = 'إجراء مناقصة';
+            item.innerHTML = `
+                <a class="d-link" onclick="popUp('مناقصة جديدة', '${path}');" style="cursor: pointer;">
+                    <i class="fas fa-clipboard-list"></i> ${text}
+                </a>
+            `;
+        });
     }
 
     function showRequests(path, method) {
@@ -82,20 +108,16 @@
             method: method,
             data: {},
             success: (data) => {
-                if (path === '/api/requests/new') {
-                    $('requests-template').html(data);
-                    $('.all-wrapper').css('overflow-y', 'hidden');
-                } else {
-                    let ejsData = ejs.render(tableTemplate, {
-                        title: 'طلبات الاستيراد',
-                        tableCount: 0,
-                        columns: data.columns,
-                        tuples: data.tuples
-                    });
-                    $('requests-template').html(ejsData);
-                    styleTables({}, 0);
-                    $('.all-wrapper').css('overflow-y', 'scroll');
-                }
+                let ejsData = ejs.render(tableTemplate, {
+                    title: 'طلبات الاستيراد',
+                    tableCount: 0,
+                    columns: data.columns,
+                    tuples: data.tuples
+                });
+                $('requests-template').html(ejsData);
+                styleTables({}, 0);
+                renderLinks();
+                $('.all-wrapper').css('overflow-y', 'scroll');
             },
             error: (xhr, ajaxOptions, thrownError) => {
                 let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});

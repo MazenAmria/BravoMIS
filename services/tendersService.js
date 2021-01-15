@@ -1,12 +1,18 @@
 const db = require('../dbConnection');
+const dbMulti = require('../dbConnectionMulti');
 
 const getOpenTenders = function getOpenTenders(username, callback) {
     db.query(`
-    SELECT T.tender_id, T.creation_time, T.deadline, CONCAT('api/offers/', T.tender_id) AS offers
-    FROM tender T
-    WHERE T.vending_manager_id LIKE '${username}' 
-    AND status LIKE 'open';
-    `, (err, results) => {
+
+        SELECT T.tender_id, 
+               T.creation_time, 
+               T.deadline, 
+               CONCAT('api/offers/', T.tender_id) AS offers
+        FROM tender T
+        WHERE T.vending_manager_id LIKE ? 
+        AND status LIKE 'open';
+
+    `, [username], (err, results) => {
         if (err) callback(err, null);
         callback(null, {
             columns: [
@@ -22,11 +28,16 @@ const getOpenTenders = function getOpenTenders(username, callback) {
 
 const getClosedTenders = function getClosedTenders(username, callback) {
     db.query(`
-    SELECT T.tender_id, T.creation_time, T.deadline, CONCAT('api/offers/', T.tender_id) AS offers
-    FROM tender T
-    WHERE T.vending_manager_id LIKE '${username}' 
-    AND status LIKE 'closed';
-    `, (err, results) => {
+
+        SELECT T.tender_id, 
+               T.creation_time, 
+               T.deadline, 
+               CONCAT('api/offers/', T.tender_id) AS offers
+        FROM tender T
+        WHERE T.vending_manager_id LIKE ?
+        AND status LIKE 'closed';
+
+    `, [username], (err, results) => {
         if (err) callback(err, null);
         callback(null, {
             columns: [
@@ -42,9 +53,15 @@ const getClosedTenders = function getClosedTenders(username, callback) {
 
 const getResolvedTenders = function getResolvedTenders(callback) {
     db.query(`
-    SELECT T.tender_id, T.creation_time, T.deadline, T.vending_manager_id, CONCAT('api/offers/', T.tender_id) AS offers
-    FROM tender T
-    WHERE status LIKE 'resolved';
+
+        SELECT T.tender_id, 
+               T.creation_time, 
+               T.deadline, 
+               T.vending_manager_id, 
+               CONCAT('api/offers/', T.tender_id) AS offers
+        FROM tender T
+        WHERE status LIKE 'resolved';
+
     `, (err, results) => {
         if (err) callback(err, null);
         callback(null, {
@@ -60,4 +77,24 @@ const getResolvedTenders = function getResolvedTenders(callback) {
     });
 }
 
-module.exports = { getOpenTenders, getClosedTenders, getResolvedTenders };
+const createNewTender = function createNewTender(tender, callback) {
+    dbMulti.query(`
+
+        INSERT INTO tender
+        SET ?;
+        UPDATE vending_request
+        SET status = 'assigned'
+        WHERE request_id = ?;
+    
+    `, [tender, tender.request_id], (err) => {
+        if (err) callback(err);
+        else callback(null);
+    });
+}
+
+module.exports = {
+    getOpenTenders,
+    getClosedTenders,
+    getResolvedTenders,
+    createNewTender
+};

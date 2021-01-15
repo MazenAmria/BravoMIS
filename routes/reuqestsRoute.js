@@ -7,8 +7,14 @@ const {
     getOwnUnresolvedRequests,
     getResolvedRequests,
     getOwnResolvedRequests,
-    getRequestItems
+    getRequestItems,
+    addRequest
 } = require('../services/requestsService');
+
+const {
+    getAllItems,
+    getItemByID
+} = require('../services/itemsService');
 
 router.get('/requests', (req, res) => {
     if (res.statusCode === 440) {
@@ -46,6 +52,21 @@ router.get('/api/requests/new', (req, res) => {
         res.locals.role.toLowerCase().match(/manager/)
     ) {
         res.render('newRequestTemplate');
+    } else {
+        res.status(404).send('Unauthorized');
+    }
+});
+
+router.post('/api/requests/new', (req, res) => {
+    if (res.status === 440) {
+        res.redirect('/login');
+    } else if (
+        res.locals.role.toLowerCase().match(/manager/)
+    ) {
+        addRequest({before_date: '2002-2-19', request_time: new Date(), manager_id: 'mazen'}, req.body.items, (err) => {
+            if (err) res.status(502).send(err);
+            else res.status(200).send();
+        });
     } else {
         res.status(404).send('Unauthorized');
     }
@@ -152,6 +173,36 @@ router.get('/api/requests/resolved/m/:username', (req, res) => {
         res.locals.role.toLowerCase().match(/manager/)
     ) {
         getOwnResolvedRequests(req.params.username, (err, data) => {
+            if (err) res.status(502).send(err);
+            else res.json(data);
+        });
+    } else {
+        res.status(404).send('Unauthorized');
+    }
+});
+
+router.get('/api/items', (req, res) => {
+    if (res.status === 440) {
+        res.redirect('/login');
+    } else if (
+        res.locals.role.toLowerCase().match(/manager/)
+    ) {
+        getAllItems((err, data) => {
+            if (err) res.status(502).send(err);
+            else res.json(data);
+        });
+    } else {
+        res.status(404).send('Unauthorized');
+    }
+});
+
+router.get('/api/items/:itemId', (req, res) => {
+    if (res.status === 440) {
+        res.redirect('/login');
+    } else if (
+        res.locals.role.toLowerCase().match(/manager/)
+    ) {
+        getItemByID(req.params.itemId, (err, data) => {
             if (err) res.status(502).send(err);
             else res.json(data);
         });

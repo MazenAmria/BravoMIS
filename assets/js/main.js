@@ -96,11 +96,36 @@ function styleTables(options, tableCount) {
     });
 }
 
+function styleTablesReduced(tableCount, height, buttons) {
+    let table = $(`.genericTable${tableCount}`).DataTable({
+        dom: 'Blfrtip',
+        select: {
+            style: 'single'
+        },
+        language: {
+            url: 'DatatablesArabic.json'
+        },
+        buttons: buttons,
+        scrollY: height,
+        scrollCollapse: true,
+        paging: false,
+        info: false
+    });
+    table.on('select deselect', function ( e, dt, type, indexes ) {
+        let selectedRows = table.rows( { selected: true } ).count();
+        if(selectedRows > 0){
+            table.buttons( 0, null ).enable();
+        }else{
+            table.buttons( 0, null ).disable();
+        }
+    });
+}
+
 const tableTemplate = `<div class='generic-table widget'>
     <div class='widget-title'>
         <h2><%= title %></h2>
     </div>
-    <table class="genericTable<%= tableCount %> display" style="width:100%">
+    <table class="genericTable<%= tableCount %> display" style="width:100%; overflow-y: scroll">
         <thead>
         <tr>
             <% for (const column of columns) { %>
@@ -119,6 +144,25 @@ const tableTemplate = `<div class='generic-table widget'>
         </tbody>
     </table>
 </div>`;
+
+const tableTemplateReduced = `<table class="genericTable<%= tableCount %> display" style="width:100%">
+        <thead>
+        <tr>
+            <% for (const column of columns) { %>
+                <th><%= column %></th>
+            <% } %>
+        </tr>
+        </thead>
+        <tbody>
+        <% for (const tuple of tuples) { %>
+            <tr>
+                <% for (const cell in tuple) { %>
+                    <td field='<%= cell %>'><%= tuple[cell] %></td>
+                <% } %>
+            </tr>
+        <% } %>
+        </tbody>
+    </table>`
 
 const errTemplate = `<div class="widget">
     <div class="widget-title">
@@ -153,4 +197,15 @@ function hidePopUp() {
             event.clientY < popUps[0].offsetTop ||
             event.clientY > (popUps[0].offsetTop + popUps[0].offsetHeight))
             $('pop-up-template').html('');
+}
+
+function getFormData($form){
+    let unindexed_array = $form.serializeArray();
+    let indexed_array = {};
+
+    $.map(unindexed_array, function(n, i){
+        indexed_array[n['name']] = n['value'];
+    });
+
+    return indexed_array;
 }

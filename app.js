@@ -29,6 +29,9 @@ app.use(cookieParser());
 
 // User Authentication
 app.get("*", reqAuth);
+app.post("*", reqAuth);
+app.put("*", reqAuth);
+app.delete("*", reqAuth);
 app.use(authRoutes);
 app.use(requestsRoute);
 app.use(tendersRoute);

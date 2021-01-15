@@ -3,7 +3,8 @@ const router = Router();
 const {
     getOpenTenders,
     getClosedTenders,
-    getResolvedTenders
+    getResolvedTenders,
+    createNewTender
 } = require('../services/tendersService');
 
 router.get('/tenders', (req, res) => {
@@ -65,6 +66,37 @@ router.get('/api/tenders/resolved', (req, res) => {
         getResolvedTenders((err, data) => {
             if (err) res.status(502).send(err);
             res.json(data);
+        });
+    } else {
+        res.status(404).send('Unauthorized');
+    }
+});
+
+router.get('/api/tenders/new', (req, res) => {
+    if (res.status === 440) {
+        res.redirect('/login');
+    } else if (
+        res.locals.role.toLowerCase().match(/vending manager/)
+    ) {
+        res.render('newTenderTemplate', {
+            requestId: req.query.requestId,
+            vendingManagerId: res.locals.username
+        });
+    } else {
+        res.status(404).send('Unauthorized');
+    }
+});
+
+router.post('/api/tenders/new', (req, res) => {
+    if (res.status === 440) {
+        res.redirect('/login');
+    } else if (
+        res.locals.role.toLowerCase().match(/vending manager/)
+    ) {
+        req.body.tender.creation_time = new Date();
+        createNewTender(req.body.tender, (err) => {
+            if (err) res.status(502).send(err);
+            else res.send();
         });
     } else {
         res.status(404).send('Unauthorized');
