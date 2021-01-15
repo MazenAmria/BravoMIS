@@ -190,4 +190,22 @@ router.delete('/items/delete', reqAuth, (req, res) => {
         }
     }
 });
+
+router.get('/itemsQuantity/api/:id', (req, res) => {
+    let role = res.locals.role.toLowerCase();
+    if (res.statusCode === 440) {
+        res.redirect('/login');
+    } else {
+        if(role == 'cashier'){
+            const itemId = req.params.id;
+            db.query(`SELECT I.remaining_quantity FROM item I WHERE I.item_id = ${itemId}`, (err, results) => {
+                if(err)
+                    console.log(err);
+                else
+                    res.send(results);
+            });
+        }
+    }
+});
+
 module.exports = router;

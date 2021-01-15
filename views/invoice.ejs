@@ -35,7 +35,7 @@
                                 </select>
                             </div>
                             <div class='quantity col-xs-1'>
-                                <input type="number" id="quantity" name="quantity" placeholder="الكمية" min="1" max='<%= items[0].remaining_quantity %>'>
+                                <input type="number" id="quantity" name="quantity" placeholder="الكمية" min="1">
                             </div>
                             <div class='addItem-button col-xs-1'><button class='btn-blue'><i class='fas fa-plus'></i></button></div>
                         </div>
@@ -77,6 +77,18 @@
         });
         return price;
     };
+    let getItemRemainingQuantity = (itemId) => {
+        let remaining_quantity = null;
+        $.ajax({
+            async: false,        
+            url:`/itemsQuantity/api/${itemId}`,
+            type: `GET`,
+            success: (data) => {
+                remaining_quantity = data[0].remaining_quantity;
+            }
+        });
+        return remaining_quantity;
+    };
     let getItemDiscount = (itemId, quantity) => {
         let discount = {percentage:0, id:null};
         $.ajax({
@@ -92,7 +104,22 @@
         });
         return discount;
     };
-     $(document).ready(() => {
+    let getInvoiceDiscount = (price) => {
+        let discount = {percentage:0, id:null};
+        $.ajax({
+            async: false,        
+            url:`/invoice/getinvoiceDiscount/${price}`,
+            type: `GET`,
+            success: (data) => {
+               if(data[0].discount_id != null){
+                discount.percentage = data[0].discount_percentage,
+                discount.id = data[0].discount_id
+               }
+            }
+        });
+        return discount;
+    };
+    $(document).ready(() => {
         $('#customer').select2();
         $('#categories').select2();
         $('#items').select2();
@@ -110,6 +137,9 @@
             });
             
         });
+
+
+
         let invoiceTable = $('.invoiceItems').DataTable({
             dom: 'Blfrtip',
             select: {
@@ -162,43 +192,153 @@
                 itemName = $('#items').select2('data')[0].text,
                 itemQuantity = $("#quantity").val(),
                 itemPrice = getItemPrice(itemId),
-                itemDiscount = getItemDiscount(itemId, itemQuantity).percentage;
+                itemDiscount = getItemDiscount(itemId, itemQuantity).percentage,
+                remaining_quantity = getItemRemainingQuantity(itemId);
                 console.log(itemDiscount);
                 let row = invoiceTable.row(`[itemId=${itemId}]`);
-            if(row.length == 0){
-                
-                let addedRow = invoiceTable.row.add( [
-                    itemName,
-                    itemQuantity,
-                    itemPrice,
-                    itemQuantity * itemPrice,
-                    itemQuantity * itemPrice - itemQuantity * itemPrice * itemDiscount/100
-                ] ).draw( false ).node();
-                $(addedRow).attr('itemId', itemId);
+
+            if(row.length > 0){
+                let quantity_in_table = parseInt($(row.node().children[1]).text());
+                remaining_quantity -= quantity_in_table;
+            }
+            
+            if(itemQuantity > remaining_quantity){
+                $.alert({
+                    title: 'فشل!',
+                    icon: 'fas fa-exclamation-triangle',
+                    draggable: false,
+                    rtl:true,
+                    closeIcon: true,
+                    type: 'orange',
+                    content: `الكمية المضافة غير متوفرة!`,
+                    buttons: {
+                        cancel: {
+                            text: 'حسنا',
+                            action: function () {
+
+                            }
+                        }
+                    }
+                });
             }else{
-                let prevQuant = $(row.node().children[1]).text(),
-                    newQuant = parseInt(prevQuant) + parseInt(itemQuantity),
-                    itemDiscount = getItemDiscount(itemId, newQuant).percentage;
-                $(row.node().children[1]).text(newQuant);
-                $(row.node().children[3]).text(newQuant * itemPrice);
-                $(row.node().children[4]).text(newQuant * itemPrice - newQuant * itemPrice * itemDiscount/100);
+            
+                if(row.length == 0){
+                    
+                    let addedRow = invoiceTable.row.add( [
+                        itemName,
+                        itemQuantity,
+                        itemPrice,
+                        itemQuantity * itemPrice,
+                        itemQuantity * itemPrice - itemQuantity * itemPrice * itemDiscount/100
+                    ] ).draw( false ).node();
+                    $(addedRow).attr('itemId', itemId);
+                    $(addedRow).attr('id', itemId);
+                }else{
+                    let prevQuant = $(row.node().children[1]).text(),
+                        newQuant = parseInt(prevQuant) + parseInt(itemQuantity),
+                        itemDiscount = getItemDiscount(itemId, newQuant).percentage;
+                    $(row.node().children[1]).text(newQuant);
+                    $(row.node().children[3]).text(newQuant * itemPrice);
+                    $(row.node().children[4]).text(newQuant * itemPrice - newQuant * itemPrice * itemDiscount/100);
+                }
             }
             
         });
         $('.submit-invoice').on('click', (e) => {
             e.preventDefault();
             let customerId = $('#customer').select2('data')[0].element.value,
-                cashierId = '<%= username%>';
-            
-            $.ajax({
-                url:`/invoice/insert`,
-                type: 'POST',
-                data: {customerId, cashierId},
-                success: () => {
+                cashierId = '<%= username%>',
+                itemsRows = invoiceTable.rows();
+            if(itemsRows.length > 0){
+                // Inserting a new invoice
+                $.ajax({
+                    url:`/invoice/insert`,
+                    type: 'POST',
+                    data: {customerId, cashierId},
+                    success: (data) => {
 
-                }
-            });    
-            
+                        // getting the invoice id and items in the table
+                        let invoiceId = parseInt(data),
+                            invoice_items_array = itemsRows.nodes(),
+                            invoice_items = [], // array to store all items need to be inserted in the database
+                            totalPrice = 0;
+
+                        // getting the added items informations
+                        for(let i = 0; i < invoice_items_array.length; i++){
+                            let itemId = invoice_items_array[i].id,
+                                quantity = parseInt(invoice_items_array[i].children[1].textContent),
+                                price_per_unit = invoice_items_array[i].children[2].textContent,
+                                discountId = getItemDiscount(itemId, quantity).id,
+                                itemDiscount = getItemDiscount(itemId, quantity).percentage;
+
+                            let invoice_item = {invoiceId,
+                                                itemId,
+                                                quantity,
+                                                price_per_unit,
+                                                discountId};
+
+                            totalPrice += quantity * parseFloat(price_per_unit) - quantity * parseFloat(price_per_unit) * itemDiscount/100;
+                            invoice_items.push(invoice_item);
+                        }
+
+                        // update the invoice table with discount id
+                        let invoice_discount = getInvoiceDiscount(totalPrice),
+                            invoice_discount_percentage;
+                        if(invoice_discount.id != null){
+                            invoice_discount_percentage = invoice_discount.percentage;
+                            $.ajax({
+                                url:'/invoice/insert/discount',
+                                type:'POST',
+                                data: {discount_id: invoice_discount.id, invoice_id: invoiceId}
+                            });
+                        }else{
+                            invoice_discount_percentage = 0;
+                        }
+                        
+                        // adding items to invoice_item table in the database
+                        $.ajax({
+                            url:'/invoice/insert/items',
+                            type: 'POST',
+                            data: {invoice_items},
+                            success: () => {
+
+                                // Update items quantity
+                                for(key in invoice_items){
+                                    $.ajax({
+                                        url:'/invoice/update/item',
+                                        type: 'POST',
+                                        data: {itemId:invoice_items[key].itemId, quantity: invoice_items[key].quantity},
+                                        success: () => {
+
+                                        }
+                                    });
+                                }
+
+                                $.alert({
+                                    title: 'نجاح!',
+                                    icon: 'fas fa-check',
+                                    draggable: false,
+                                    rtl:true,
+                                    closeIcon: true,
+                                    type: 'green',
+                                    content: `<div>تمت الإضافة بنجاح</div>
+                                    <div>مجموع الفاتورة = ${totalPrice}<div>
+                                        <div>مجموع الفاتورة بعد الخصم = ${totalPrice - totalPrice * invoice_discount_percentage / 100}</div>`,
+                                    buttons: {
+                                        cancel: {
+                                            text: 'حسنا',
+                                            action: function () {
+
+                                            }
+                                        }
+                                    }
+                                });
+                                
+                            }
+                        });
+                    }
+                });
+            }
         });
 
      });
