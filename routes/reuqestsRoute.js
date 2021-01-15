@@ -63,7 +63,11 @@ router.post('/api/requests/new', (req, res) => {
     } else if (
         res.locals.role.toLowerCase().match(/manager/)
     ) {
-        addRequest({before_date: '2002-2-19', request_time: new Date(), manager_id: 'mazen'}, req.body.items, (err) => {
+        addRequest({
+            before_date: req.body.beforeDate,
+            request_time: new Date(),
+            manager_id: res.locals.username
+        }, req.body.items, (err) => {
             if (err) res.status(502).send(err);
             else res.status(200).send();
         });

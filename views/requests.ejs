@@ -108,16 +108,21 @@
             method: method,
             data: {},
             success: (data) => {
-                let ejsData = ejs.render(tableTemplate, {
-                    title: 'طلبات الاستيراد',
-                    tableCount: 0,
-                    columns: data.columns,
-                    tuples: data.tuples
-                });
-                $('requests-template').html(ejsData);
-                styleTables({}, 0);
-                renderLinks();
-                $('.all-wrapper').css('overflow-y', 'scroll');
+                if (path !== '/api/requests/new') {
+                    let ejsData = ejs.render(tableTemplate, {
+                        title: 'طلبات الاستيراد',
+                        tableCount: 0,
+                        columns: data.columns,
+                        tuples: data.tuples
+                    });
+                    $('requests-template').html(ejsData);
+                    styleTables({}, 0);
+                    renderLinks();
+                    $('.all-wrapper').css('overflow-y', 'scroll');
+                } else {
+                    $('requests-template').html(data);
+                    $('.all-wrapper').css('overflow-y', 'hidden');
+                }
             },
             error: (xhr, ajaxOptions, thrownError) => {
                 let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});

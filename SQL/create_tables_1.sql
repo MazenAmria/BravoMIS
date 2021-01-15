@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS employee (
 	emp_id VARCHAR(50),		                                -- username
     emp_password VARCHAR(200) NOT NULL,	                    -- encrypted password
-    emp_name VARCHAR(50) NOT NULL ,				            -- real name
+    emp_name VARCHAR(50) NOT NULL,				            -- real name
     emp_role VARCHAR(50) DEFAULT 'Unauthorized',            -- [Manager|Vending Manager|Cashier|Guest|Unauthorized]
     emp_registration_date DATE NOT NULL,
     emp_status VARCHAR(50) DEFAULT 'Employed',              -- [Employed|Retired|Fired]
@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS employee (
 );
 
 CREATE TABLE IF NOT EXISTS vendor (
-	vendor_id VARCHAR(50),
+	vendor_id VARCHAR(50),                                  -- vendor's email
+	secret_key VARCHAR(200) NOT NULL,
     vendor_name VARCHAR(50),			                    -- vendor's name
     vendor_location VARCHAR(50),    	                    -- vendor's country
     PRIMARY KEY (vendor_id)
@@ -74,8 +75,7 @@ CREATE TABLE IF NOT EXISTS invoice_includes_item (
     discount_id INTEGER,
     PRIMARY KEY (item_id, invoice_id),
     FOREIGN KEY (item_id) REFERENCES item(item_id),
-    FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id),
-    FOREIGN KEY (discount_id) REFERENCES item_discount(discount_id)
+    FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id)
 );
 
 -- BY: AHMAD KHATIB (PART 2)
@@ -90,6 +90,8 @@ CREATE TABLE IF NOT EXISTS item_discount(
     PRIMARY KEY (discount_id),
     FOREIGN KEY (item_id) REFERENCES item(item_id)
 );
+
+ALTER TABLE invoice_includes_item ADD FOREIGN KEY (discount_id) REFERENCES item_discount(discount_id);
 
 -- BY: MAZEN AMRIA (PART 2)
 CREATE TABLE IF NOT EXISTS vending_process (

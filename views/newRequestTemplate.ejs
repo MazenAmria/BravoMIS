@@ -38,48 +38,88 @@
             });
             return;
         }
-        $.ajax({
-            url: 'api/requests/new',
-            method: 'POST',
-            data: {
-                items: items
-            },
-            success: () => {
-                $.alert({
-                    title: `نجاح!`,
-                    icon: 'fas fa-check',
-                    draggable: false,
-                    rtl: true,
-                    closeIcon: true,
-                    type: 'green',
-                    content: 'تم إضافة الطلب بنجاح :)',
-                    buttons: {
-                        cancel: {
-                            text: 'حسنًا',
-                            keys: ['enter']
+        $.confirm({
+            title: 'تأكيد',
+            type: 'blue',
+            icon: 'fas fa-check',
+            draggable: false,
+            rtl: true,
+            closeIcon: true,
+            content: `<span>الموعد النهائي للاستيراد:</span>
+            <input type="datetime-local" id="before_date" required>
+            `,
+            buttons: {
+                cancel: {
+                    text: 'إلغاء'
+                },
+                confirm: {
+                    text: 'تثبيت',
+                    action: () => {
+                        if (!$('#before_date')[0].validity.valid) {
+                            $.alert({
+                                title: `غير مكتمل!`,
+                                icon: 'fas fa-exclamation-triangle',
+                                draggable: false,
+                                rtl: true,
+                                closeIcon: true,
+                                type: 'red',
+                                content: 'حدد موعدًا لاستيراد المنتجات!',
+                                buttons: {
+                                    cancel: {
+                                        text: 'حسنًا',
+                                        keys: ['enter']
+                                    }
+                                }
+                            });
+                            return false;
                         }
+                        $.ajax({
+                            url: 'api/requests/new',
+                            method: 'POST',
+                            data: {
+                                beforeDate: $('#before_date')[0].value,
+                                items: items
+                            },
+                            success: () => {
+                                $.alert({
+                                    title: `نجاح!`,
+                                    icon: 'fas fa-check',
+                                    draggable: false,
+                                    rtl: true,
+                                    closeIcon: true,
+                                    type: 'green',
+                                    content: 'تم إضافة الطلب بنجاح :)',
+                                    buttons: {
+                                        cancel: {
+                                            text: 'حسنًا',
+                                            keys: ['enter']
+                                        }
+                                    }
+                                });
+                                [...$('.h-nav-item')][3].click();
+                            },
+                            error: () => {
+                                $.alert({
+                                    title: `أوبس!`,
+                                    icon: 'fas fa-exclamation-triangle',
+                                    draggable: false,
+                                    rtl: true,
+                                    closeIcon: true,
+                                    type: 'red',
+                                    content: 'حدث خطأ ما أثناء تسجيل الطلب، حاول مرة أخرى!',
+                                    buttons: {
+                                        cancel: {
+                                            text: 'حسنًا',
+                                            keys: ['enter']
+                                        }
+                                    }
+                                });
+                            }
+                        });
                     }
-                });
-                [...$('.h-nav-item')][3].click();
-            },
-            error: () => {
-                $.alert({
-                    title: `أوبس!`,
-                    icon: 'fas fa-exclamation-triangle',
-                    draggable: false,
-                    rtl: true,
-                    closeIcon: true,
-                    type: 'red',
-                    content: 'حدث خطأ ما أثناء تسجيل الطلب، حاول مرة أخرى!',
-                    buttons: {
-                        cancel: {
-                            text: 'حسنًا',
-                            keys: ['enter']
-                        }
-                    }
-                });
+                }
             }
-        });
+        })
     }
 
     function showItems() {
