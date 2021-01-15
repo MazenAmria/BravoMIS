@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS employee (
 
 CREATE TABLE IF NOT EXISTS vendor (
 	vendor_id VARCHAR(50),                                  -- vendor's email
-	secret_key VARCHAR(200) NOT NULL,
+	secret_key VARCHAR(128) NOT NULL UNIQUE,
     vendor_name VARCHAR(50),			                    -- vendor's name
     vendor_location VARCHAR(50),    	                    -- vendor's country
     PRIMARY KEY (vendor_id)
@@ -128,15 +128,15 @@ CREATE TABLE IF NOT EXISTS vending_request (
 );
 
 CREATE TABLE IF NOT EXISTS tender (
-    tender_id INTEGER AUTO_INCREMENT,
     request_id INTEGER,
     vending_manager_id VARCHAR(50),
     creation_time DATETIME NOT NULL,
     deadline DATETIME NOT NULL,
+    secret_key VARCHAR(128) NOT NULL UNIQUE,
     status VARCHAR(50) DEFAULT 'open',                      -- the status of the tender [open|closed|resolved]
     FOREIGN KEY (vending_manager_id) REFERENCES employee(emp_id),
     FOREIGN KEY (request_id) REFERENCES vending_request(request_id),
-    PRIMARY KEY (tender_id),
+    PRIMARY KEY (request_id),
     CONSTRAINT CHECK (status IN ('open', 'closed', 'resolved'))
 );
 
@@ -151,13 +151,12 @@ CREATE TABLE IF NOT EXISTS vending_request_items (
 
 CREATE TABLE IF NOT EXISTS offer (
     offer_id INTEGER AUTO_INCREMENT,
-    tender_id INTEGER,
+    request_id INTEGER,
     vendor_id VARCHAR(50),
-    vending_price DOUBLE NOT NULL,
     vending_date DATE NOT NULL,
     submission_time DATETIME NOT NULL,
     FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id),
-    FOREIGN KEY (tender_id) REFERENCES tender(tender_id),
+    FOREIGN KEY (request_id) REFERENCES vending_request(request_id),
     PRIMARY KEY (offer_id)
 );
 

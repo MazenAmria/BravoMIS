@@ -2,6 +2,10 @@ const express = require("express");
 const authRoutes = require("./routes/authRoute");
 const requestsRoute = require("./routes/reuqestsRoute");
 const tendersRoute = require("./routes/tendersRoute");
+const vendorsRoute = require("./routes/vendorsRoute");
+const offersRoute = require("./routes/offersRoute");
+const vendingProcessesRoute = require("./routes/vendingProcessesRoute");
+const vendingProcessItemsRoute = require("./routes/vendingProcessItemsRoute");
 const employeesRoute = require("./routes/employeesRoute");
 const errorRoute = require("./routes/errorRoute");
 const categoriesRoute = require("./routes/categoriesRoute");
@@ -10,6 +14,7 @@ const salesRoute = require("./routes/salesRoute");
 const invoiceRoute = require("./routes/invoiceRoute");
 const cookieParser = require('cookie-parser');
 const {reqAuth} = require('./middlewares/authMiddleware');
+const db = require('./dbConnectionMulti');
 
 // express app
 const app = express();
@@ -35,9 +40,27 @@ app.delete("*", reqAuth);
 app.use(authRoutes);
 app.use(requestsRoute);
 app.use(tendersRoute);
+app.use(vendorsRoute);
+app.use(offersRoute);
+app.use(vendingProcessesRoute);
+app.use(vendingProcessItemsRoute);
 app.use(employeesRoute);
 app.use(categoriesRoute);
 app.use(managerCustomersRoute);
 app.use(salesRoute);
 app.use(invoiceRoute);
 app.use(errorRoute);
+
+// Check the deadlines every 3 minutes
+const schedule = require('node-schedule');
+
+
+const check = schedule.scheduleJob('*/3 * * * *', function () {
+    db.query(`
+    
+        UPDATE tender
+        SET status = 'closed'
+        WHERE deadline < NOW();
+    
+    `);
+});

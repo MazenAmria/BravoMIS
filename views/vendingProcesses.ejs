@@ -4,7 +4,7 @@
             <% for (const tab of tabs) { %>
                 <li class="h-nav-item"
                     onclick="
-                            showTenders('/<%= tab.path %>');
+                            showProcesses('/<%= tab.path %>');
                             [...$('.h-nav-item')].forEach(item => item.classList.remove('active'));
                             event.currentTarget.classList.add('active');
                             "><%= tab.title %></li>
@@ -12,13 +12,15 @@
         </ul>
     </div>
     <div class="row">
-        <tenders-template></tenders-template>
+        <processes-template></processes-template>
     </div>
 </div>
+
 <script type="text/javascript">
     $(document).ready(() => {
         [...$('.h-nav-item')][0].click();
     });
+
 
     function popUp(title, path) {
         event.preventDefault();
@@ -67,44 +69,44 @@
     }
 
     function renderLinks() {
-        [...$('td')].filter(item => item.getAttribute('field') === 'offers').forEach((item) => {
+        [...$('td')].filter(item => item.getAttribute('field') === 'process_items').forEach((item) => {
             let path = `/${item.innerHTML}`;
-            let text = 'قائمة العروض';
+            let text = 'قائمة المنتجات';
             item.innerHTML = `
-                <a class="d-link" onclick="popUp('العروض', '${path}');" style="cursor: pointer;">
+                <a class="d-link" onclick="popUp('قائمة المنتجات', '${path}');" style="cursor: pointer;">
                     <i class="fas fa-clipboard-list"></i> ${text}
                 </a>
             `;
         });
     }
 
-    function showTenders(path) {
-        if (path === `/api/tenders/new`) {
-            event.preventDefault();
-            let ejsData = ejs.render(tenderFormTemplate);
-            $('tenders-template').html(ejsData);
-        } else {
-            event.preventDefault();
-            $.ajax({
-                url: path,
-                method: 'GET',
-                data: {},
-                success: (data) => {
+    function showProcesses(path) {
+        event.preventDefault();
+        $.ajax({
+            url: path,
+            method: 'GET',
+            data: {},
+            success: (data) => {
+                if (path !== '/api/vending-processes/new') {
                     let ejsData = ejs.render(tableTemplate, {
-                        title: 'المناقصات',
+                        title: 'سجل الاستيراد',
                         tableCount: 0,
                         columns: data.columns,
                         tuples: data.tuples
                     });
-                    $('tenders-template').html(ejsData);
+                    $('processes-template').html(ejsData);
                     styleTables({}, 0);
                     renderLinks();
-                },
-                error: (xhr, ajaxOptions, thrownError) => {
-                    let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});
-                    $('tenders-template').html(ejsData);
+                    $('.all-wrapper').css('overflow-y', 'scroll');
+                } else {
+                    $('processes-template').html(data);
+                    $('.all-wrapper').css('overflow-y', 'hidden');
                 }
-            });
-        }
+            },
+            error: (xhr, ajaxOptions, thrownError) => {
+                let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});
+                $('processes-template').html(ejsData);
+            }
+        });
     }
 </script>

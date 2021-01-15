@@ -7,11 +7,51 @@
         data: {
             tender: getFormData($('form'))
         },
-        success: () => {
-            alert('HHHHH');
+        success: (data) => {
+            [...$('.jconfirm-closeIcon')][0].click();
+            [...$('.h-nav-item')][1].click();
+            let ejsData = ejs.render(tableTemplateReduced, {
+                tableCount: 1,
+                columns: data.columns,
+                tuples: data.tuples
+            });
+            $.alert({
+                title: `نجاح!`,
+                icon: 'fas fa-check',
+                columnClass: 'col-md-6 col-md-offset-3',
+                draggable: false,
+                rtl: true,
+                closeIcon: true,
+                type: 'green',
+                content: ejsData,
+                onContentReady: () => {
+                    renderLinks();
+                    styleTablesReduced(1, '50vh', {});
+                },
+                buttons: {
+                    cancel: {
+                        text: 'حسنًا',
+                        keys: ['enter']
+                    }
+                }
+            });
         },
         error: () => {
-            alert('EEEEE');
+            $.alert({
+                title: `خطأ!`,
+                icon: 'fas fa-exclamation-triangle',
+                draggable: false,
+                rtl: true,
+                closeIcon: true,
+                type: 'red',
+                content: 'حدث خطأ داخلي، يرجى إعادة المحاولة لاحقًا!',
+                buttons: {
+                    cancel: {
+                        text: 'حسنًا',
+                        keys: ['enter']
+                    }
+                }
+            });
         }
     });
 
@@ -41,3 +81,17 @@
         <button class="mbutton">إجراء المناقصة</button>
     </div>
 </form>
+
+<script>
+    function renderLinks() {
+        [...$('td')].filter(item => item.getAttribute('field') === 'submit_offer').forEach((item) => {
+            let path = `/${item.innerHTML}`;
+            let text = 'رابط تقديم الطلب';
+            item.innerHTML = `
+                <a class="d-link" href="${path}" target="_blank" style="cursor: pointer;">
+                    <i class="fas fa-external-link-alt"></i> ${text}
+                </a>
+            `;
+        });
+    }
+</script>

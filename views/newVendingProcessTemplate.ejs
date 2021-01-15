@@ -1,0 +1,295 @@
+<div class="row">
+    <div class='col-sm-6 col-xs-12'>
+        <div class='widget' style="height: calc(100vh - 260px); overflow-y: hidden;">
+            <vended-template></vended-template>
+            <button class='main-background submit-employee mbutton' onclick="submitProcess()"><span><i class="fas fa-plus"></i></span>توثيق الاستيراد</button>
+        </div>
+    </div>
+    <div class='col-sm-6 col-xs-12'>
+        <div class="widget" style="height: calc(100vh - 260px); overflow-y: hidden;">
+            <items-template></items-template>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(() => {
+        showItems();
+        showVended();
+    });
+
+    function submitProcess() {
+        let items = $('.genericTable0').DataTable().rows().data().toArray();
+        if (!items || items.length < 1) {
+            $.alert({
+                title: `غير مكتمل!`,
+                icon: 'fas fa-exclamation-triangle',
+                draggable: false,
+                rtl: true,
+                closeIcon: true,
+                type: 'red',
+                content: 'اختر منتجات للاستيراد!',
+                buttons: {
+                    cancel: {
+                        text: 'حسنًا',
+                        keys: ['enter']
+                    }
+                }
+            });
+            return;
+        }
+        $.confirm({
+            title: 'تأكيد',
+            type: 'blue',
+            icon: 'fas fa-check',
+            draggable: false,
+            rtl: true,
+            closeIcon: true,
+            content: `<span>المورّد:</span>
+            <input type="text" id="vendor_id" required>
+            `,
+            buttons: {
+                cancel: {
+                    text: 'إلغاء'
+                },
+                confirm: {
+                    text: 'تثبيت',
+                    action: () => {
+                        if (!$('#vendor_id')[0].validity.valid) {
+                            $.alert({
+                                title: `غير مكتمل!`,
+                                icon: 'fas fa-exclamation-triangle',
+                                draggable: false,
+                                rtl: true,
+                                closeIcon: true,
+                                type: 'red',
+                                content: 'أدخل اسم المورّد!',
+                                buttons: {
+                                    cancel: {
+                                        text: 'حسنًا',
+                                        keys: ['enter']
+                                    }
+                                }
+                            });
+                            return false;
+                        }
+                        $.ajax({
+                            url: 'api/vending-processes/new',
+                            method: 'POST',
+                            data: {
+                                vendor_id: $('#vendor_id')[0].value,
+                                items: items
+                            },
+                            success: () => {
+                                [...$('.h-nav-item')][2].click();
+                                $.alert({
+                                    title: `نجاح!`,
+                                    icon: 'fas fa-check',
+                                    draggable: false,
+                                    rtl: true,
+                                    closeIcon: true,
+                                    type: 'green',
+                                    content: 'تم توثيق الاستيراد بنجاح :)',
+                                    buttons: {
+                                        cancel: {
+                                            text: 'حسنًا',
+                                            keys: ['enter']
+                                        }
+                                    }
+                                });
+                            },
+                            error: () => {
+                                $.alert({
+                                    title: `أوبس!`,
+                                    icon: 'fas fa-exclamation-triangle',
+                                    draggable: false,
+                                    rtl: true,
+                                    closeIcon: true,
+                                    type: 'red',
+                                    content: 'حدث خطأ ما أثناء توثيق الاستيراد، حاول مرة أخرى!',
+                                    buttons: {
+                                        cancel: {
+                                            text: 'حسنًا',
+                                            keys: ['enter']
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        })
+    }
+
+    function showItems() {
+        $.ajax({
+            url: '/api/items',
+            method: 'GET',
+            data: {},
+            success: (data) => {
+                let ejsData = ejs.render(tableTemplateReduced, {
+                    tableCount: 1,
+                    columns: data.columns,
+                    tuples: data.tuples
+                });
+                $('items-template').html(ejsData);
+                styleTablesReduced(1, '37.3vh', [
+                    {
+                        text: 'إضافة',
+                        attr: { id: 'editButton' },
+                        enabled: false,
+                        action: function ( e, dt, node, config ) {
+                            let rows = dt.rows( { selected: true } );
+                            let name = rows.data()[0][1]
+                            $.confirm({
+                                title: `إضافة المنتج: ${name}`,
+                                icon: 'fas fa-tasks',
+                                draggable: false,
+                                rtl: true,
+                                closeIcon: true,
+                                type: 'blue',
+                                columnClass: 'col-md-6 col-md-offset-3',
+                                content: `
+                                <form class="col-md-12">
+                                    <div class="row form-group"><label class="col-md-4" for="quantity">الكمية المستوردة:</label>
+                                    <input class="col-md-8" type="number" id="quantityS" name="quantity" required></div>
+                                    <div class="row form-group"><label class="col-md-4" for="vending_price">سعر الاستيراد:</label>
+                                    <input class="col-md-8" type="number" id="vending_price" name="vending_price" required></div>
+                                    <div class="row form-group"><label class="col-md-4" for="production_date">تاريخ الانتاج:</label>
+                                    <input class="col-md-8" type="datetime-local" id="production_date" name="production_date" required></div>
+                                    <div class="row form-group"><label class="col-md-4" for="expiry_date">تاريخ الانتهاء:</label>
+                                    <input class="col-md-8" type="datetime-local" id="expiry_date" name="expiry_date" required></div>
+                                </form>
+                                `,
+                                buttons: {
+                                    cancel: {
+                                        text: 'إلغاء'
+                                    },
+                                    submit: {
+                                        text: 'إضافة',
+                                        keys: ['enter'],
+                                        action: () => {
+                                            if (
+                                                $('#quantityS')[0].validity.valid &&
+                                                $('#vending_price')[0].validity.valid &&
+                                                $('#production_date')[0].validity.valid &&
+                                                $('#expiry_date')[0].validity.valid
+                                            ) {
+                                                let otherTable = $('.genericTable0').DataTable();
+                                                data = [
+                                                    rows.data()[0][0],
+                                                    $('#quantityS')[0].value,
+                                                    $('#vending_price')[0].value,
+                                                    $('#production_date')[0].value,
+                                                    $('#expiry_date')[0].value
+                                                ];
+                                                otherTable.row.add(data).draw();
+                                                rows.remove().draw();
+                                                dt.button(0).enable(false);
+                                            } else {
+                                                $.alert({
+                                                    title: `غير مكتمل!`,
+                                                    icon: 'fas fa-exclamation-triangle',
+                                                    draggable: false,
+                                                    rtl: true,
+                                                    closeIcon: true,
+                                                    type: 'red',
+                                                    content: 'أدخل كافة التفاصيل رجاءً',
+                                                    buttons: {
+                                                        cancel: {
+                                                            text: 'حسنًا',
+                                                            keys: ['enter']
+                                                        }
+                                                    }
+                                                });
+                                                return false;
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                ]);
+            },
+            error: (xhr, ajaxOptions, thrownError) => {
+                let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});
+                $('items-template').html(ejsData);
+            }
+        });
+    }
+
+    function showVended() {
+        let ejsData = ejs.render(tableTemplateReduced, {
+            tableCount: 0,
+            columns: [
+                'المعرف',
+                'الكمية',
+                'السعر',
+                'تاريخ الانتاج',
+                'تاريخ الانتهاء'
+            ],
+            tuples: []
+        });
+        $('vended-template').html(ejsData);
+        styleTablesReduced(0, '27.3vh', [
+            {
+                text: 'حذف',
+                attr: { id: 'deleteButton' },
+                enabled: false,
+                action: function ( e, dt, node, config ) {
+                    $.confirm({
+                        title: `تأكيد!`,
+                        icon: 'fas fa-exclamation-triangle',
+                        draggable: false,
+                        rtl: true,
+                        closeIcon: true,
+                        type: 'red',
+                        content: 'هل أنت متأكد من أنك تريد حذف هذا المنتج من قائمة الطلبات؟',
+                        buttons: {
+                            cancel: {
+                                text: 'لا',
+                                keys: ['enter']
+                            },
+                            confirm: {
+                                text: 'نعم',
+                                action: () => {
+                                    let rows = dt.rows( { selected: true } );
+                                    $.ajax({
+                                        url: `api/items/${rows.data()[0][0]}`,
+                                        method: 'GET',
+                                        data: {},
+                                        success: (data) => {
+                                            let otherTable = $('.genericTable1').DataTable();
+                                            otherTable.row.add(Object.values(data)).draw();
+                                            rows.remove().draw();
+                                        },
+                                        error: () => {
+                                            $.alert({
+                                                title: 'أوبس!',
+                                                icon: 'fas fa-exclamation-triangle',
+                                                draggable: false,
+                                                rtl: true,
+                                                closeIcon: true,
+                                                type: 'red',
+                                                content: `حدث خطأ داخلي أثناء محاولة حذف المنتج! يرجى المحاولة مرة أخرى`,
+                                                buttons: {
+                                                    cancel: {
+                                                        text: 'حسنًا',
+                                                        keys: ['enter']
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                    dt.buttons().disable();
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        ]);
+    }
+</script>

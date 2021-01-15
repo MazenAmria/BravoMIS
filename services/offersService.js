@@ -1,6 +1,6 @@
 const db = require('../dbConnection');
 
-const getOffersByTenderId = function getOffersByTenderId(tenderId, callback) {
+const getOffersByRequestId = function getOffersByRequestId(tenderId, callback) {
     db.query(`
     
         SELECT offer_id, 
@@ -8,7 +8,7 @@ const getOffersByTenderId = function getOffersByTenderId(tenderId, callback) {
                vending_date, 
                submission_time 
         FROM offer 
-        WHERE tender_id = ?;
+        WHERE request_id = ?;
     
     `, [tenderId], (err, results) => {
         if (err) callback(err, null);
@@ -23,4 +23,4 @@ const getOffersByTenderId = function getOffersByTenderId(tenderId, callback) {
     });
 }
 
-module.exports = { getOffersByTenderId }
+module.exports = { getOffersByRequestId }

@@ -57,7 +57,7 @@ const getUnresolvedRequests = function getUnresolvedRequests(username, callback)
                VR.before_date, 
                T.deadline, 
                VR.manager_id, 
-               CONCAT('api/offers/', T.tender_id) AS offers
+               CONCAT('api/offers/', T.request_id) AS offers
         FROM vending_request VR
         JOIN tender T ON VR.request_id = T.request_id
         WHERE T.vending_manager_id LIKE ?
@@ -87,7 +87,7 @@ const getOwnUnresolvedRequests = function getOwnUnresolvedRequests(username, cal
                VR.before_date, 
                T.deadline, 
                T.vending_manager_id, 
-               CONCAT('api/offers/', T.tender_id) AS offers
+               CONCAT('api/offers/', T.request_id) AS offers
         FROM vending_request VR
         JOIN tender T ON VR.request_id = T.request_id
         WHERE VR.manager_id LIKE ?
@@ -116,7 +116,7 @@ const getResolvedRequests = function getResolvedRequests(username, callback) {
                CONCAT('api/requests/', VR.request_id) AS requested_items,
                VR.before_date, 
                T.deadline, 
-               VR.manager_id, CONCAT('api/offers/', T.tender_id) AS offers
+               VR.manager_id, CONCAT('api/offers/', T.request_id) AS offers
         FROM vending_request VR
         JOIN tender T ON VR.request_id = T.request_id
         WHERE T.vending_manager_id LIKE ?
@@ -146,7 +146,7 @@ const getOwnResolvedRequests = function getOwnResolvedRequests(username, callbac
                VR.before_date, 
                T.deadline, 
                T.vending_manager_id, 
-               CONCAT('api/offers/', T.tender_id) AS offers
+               CONCAT('api/offers/', T.request_id) AS offers
         FROM vending_request VR
         JOIN tender T ON VR.request_id = T.request_id
         WHERE VR.manager_id LIKE ?

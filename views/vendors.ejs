@@ -4,7 +4,7 @@
             <% for (const tab of tabs) { %>
                 <li class="h-nav-item"
                     onclick="
-                            showTenders('/<%= tab.path %>');
+                            showVendors('/<%= tab.path %>');
                             [...$('.h-nav-item')].forEach(item => item.classList.remove('active'));
                             event.currentTarget.classList.add('active');
                             "><%= tab.title %></li>
@@ -12,13 +12,15 @@
         </ul>
     </div>
     <div class="row">
-        <tenders-template></tenders-template>
+        <vendors-template></vendors-template>
     </div>
 </div>
+
 <script type="text/javascript">
     $(document).ready(() => {
         [...$('.h-nav-item')][0].click();
     });
+
 
     function popUp(title, path) {
         event.preventDefault();
@@ -27,11 +29,14 @@
             method: 'GET',
             data: {},
             success: (data) => {
-                let ejsData = ejs.render(tableTemplateReduced, {
-                    tableCount: 1,
-                    columns: data.columns,
-                    tuples: data.tuples
-                });
+                let ejsData = data;
+                if (!path.match(/\/api\/tenders\/new.*/)) {
+                    ejsData = ejs.render(tableTemplateReduced, {
+                        tableCount: 1,
+                        columns: data.columns,
+                        tuples: data.tuples
+                    });
+                }
                 $.alert({
                     title: title,
                     draggable: false,
@@ -40,7 +45,8 @@
                     type: 'blue',
                     content: ejsData,
                     onContentReady: () => {
-                        styleTablesReduced(1, '50vh', [])
+                        if (!path.match(/\/api\/tenders\/new.*/))
+                            styleTablesReduced(1, '50vh', [])
                     },
                     columnClass: 'col-md-6 col-md-offset-3',
                     buttons: []
@@ -67,44 +73,44 @@
     }
 
     function renderLinks() {
-        [...$('td')].filter(item => item.getAttribute('field') === 'offers').forEach((item) => {
+        [...$('td')].filter(item => item.getAttribute('field') === 'vending_processes').forEach((item) => {
             let path = `/${item.innerHTML}`;
-            let text = 'قائمة العروض';
+            let text = 'سجل الاستيراد';
             item.innerHTML = `
-                <a class="d-link" onclick="popUp('العروض', '${path}');" style="cursor: pointer;">
+                <a class="d-link" onclick="popUp('سجل الاستيراد', '${path}');" style="cursor: pointer;">
                     <i class="fas fa-clipboard-list"></i> ${text}
                 </a>
             `;
         });
     }
 
-    function showTenders(path) {
-        if (path === `/api/tenders/new`) {
-            event.preventDefault();
-            let ejsData = ejs.render(tenderFormTemplate);
-            $('tenders-template').html(ejsData);
-        } else {
-            event.preventDefault();
-            $.ajax({
-                url: path,
-                method: 'GET',
-                data: {},
-                success: (data) => {
+    function showVendors(path) {
+        event.preventDefault();
+        $.ajax({
+            url: path,
+            method: 'GET',
+            data: {},
+            success: (data) => {
+                if (path !== '/api/vendors/new') {
                     let ejsData = ejs.render(tableTemplate, {
-                        title: 'المناقصات',
+                        title: 'الموردين',
                         tableCount: 0,
                         columns: data.columns,
                         tuples: data.tuples
                     });
-                    $('tenders-template').html(ejsData);
+                    $('vendors-template').html(ejsData);
                     styleTables({}, 0);
                     renderLinks();
-                },
-                error: (xhr, ajaxOptions, thrownError) => {
-                    let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});
-                    $('tenders-template').html(ejsData);
+                    $('.all-wrapper').css('overflow-y', 'scroll');
+                } else {
+                    $('vendors-template').html(data);
+                    $('.all-wrapper').css('overflow-y', 'hidden');
                 }
-            });
-        }
+            },
+            error: (xhr, ajaxOptions, thrownError) => {
+                let ejsData = ejs.render(errTemplate, {errCode: xhr.status, errMessage: thrownError});
+                $('vendors-template').html(ejsData);
+            }
+        });
     }
 </script>

@@ -4,7 +4,8 @@ const {
     getOpenTenders,
     getClosedTenders,
     getResolvedTenders,
-    createNewTender
+    createNewTender,
+    getOffersSubmissionUrls
 } = require('../services/tendersService');
 
 router.get('/tenders', (req, res) => {
@@ -96,7 +97,10 @@ router.post('/api/tenders/new', (req, res) => {
         req.body.tender.creation_time = new Date();
         createNewTender(req.body.tender, (err) => {
             if (err) res.status(502).send(err);
-            else res.send();
+            else getOffersSubmissionUrls(req.body.tender.request_id, (err, data) => {
+                    if (err) res.status(502).send(err);
+                    else res.json(data);
+                });
         });
     } else {
         res.status(404).send('Unauthorized');

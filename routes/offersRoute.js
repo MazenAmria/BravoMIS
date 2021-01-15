@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 const {
-    getOffersByTenderId
+    getOffersByRequestId
 } = require('../services/offersService');
 
 router.get('/api/offers/:id', (req, res) => {
@@ -10,7 +10,7 @@ router.get('/api/offers/:id', (req, res) => {
     } else if (
         res.locals.role.toLowerCase().match(/vending manager/)
     ) {
-        getOffersByTenderId(req.params.id, (err, data) => {
+        getOffersByRequestId(req.params.id, (err, data) => {
             if (err) res.status(502).send(err);
             res.json(data);
         });
