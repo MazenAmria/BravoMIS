@@ -20,11 +20,11 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MazenAmria/Bravo-Supermarket-Phase-3.git"
+    "url": "git+https://github.com/MazenAmria/BravoMIS.git"
   },
   "bugs": {
-    "url": "https://github.com/MazenAmria/Bravo-Supermarket-Phase-3/issues"
+    "url": "https://github.com/MazenAmria/BravoMIS/issues"
   },
-  "homepage": "https://github.com/MazenAmria/Bravo-Supermarket-Phase-3#readme",
+  "homepage": "https://github.com/MazenAmria/BravoMIS#readme",
   "description": ""
 }
